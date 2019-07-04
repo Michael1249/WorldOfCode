@@ -29,7 +29,7 @@ const std::string& CommandParser::parse_string(const std::string& pCommand_str)
                 args.push_back(temp);
             }
 
-            command_iter->second.exec(args);
+            responce = &command_iter->second.exec(args);
         }
         else
         {

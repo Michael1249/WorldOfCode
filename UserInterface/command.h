@@ -11,7 +11,7 @@ public:
 
     Command() = default;
 
-    void exec(const args_t&);
+    const std::string& exec(const args_t&);
     const std::string& getName() const;
 
 private:

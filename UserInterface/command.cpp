@@ -1,8 +1,8 @@
 #include "command.h"
 
-Command::Command()
+std::string Command::exec(const Command::args_t &)
 {
-
+    return "";
 }
 
 const std::string& Command::getName() const

@@ -7,15 +7,33 @@
 class Command
 {
 public:
-    using args_t = std::vector<std::string>;
+    using arg_t = std::string;
+    using args_t = std::vector<arg_t>;
+    using arg_values_t = std::vector<std::string>;
 
     Command() = default;
 
-    const std::string& exec(const args_t&);
+    void exec(const args_t& pArgs);
     const std::string& getName() const;
 
 private:
     std::string mName;
+
+    struct ArgumentInfo
+    {
+        std::string name;
+        char option_name;
+        std::string help;
+        std::string default_value;
+    };
+
+    std::vector<ArgumentInfo> mArgs_info;
+
+    bool isOptionon(const arg_t& pArg);
+    bool isNamedArgument(const arg_t& pArg);
+    int32_t getArgPosition(const arg_t& pArg);
+    int32_t getOptionPosition(char pOpt);
+    std::string extractValue(const arg_t& pArg);
 };
 
 #endif // COMMAND_H

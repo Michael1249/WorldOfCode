@@ -7,9 +7,8 @@ void CommandParser::add_command(const Command &pCommand)
     mCommands.insert({pCommand.getName(), pCommand});
 }
 
-const std::string& CommandParser::parse_string(const std::string& pCommand_str)
+void CommandParser::parse_string(const std::string& pCommand_str)
 {
-    std::string const* responce = &RESP_EMPTY_STRING;
     std::istringstream parse(pCommand_str);
 
     std::string command_name;
@@ -29,14 +28,9 @@ const std::string& CommandParser::parse_string(const std::string& pCommand_str)
                 args.push_back(temp);
             }
 
-            responce = &command_iter->second.exec(args);
-        }
-        else
-        {
-            responce = &RESP_UNKNOWN_COMMAND;
+            command_iter->second.exec(args);
         }
 
     }
 
-    return *responce;
 }

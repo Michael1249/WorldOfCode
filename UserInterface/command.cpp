@@ -1,7 +1,7 @@
 #include <QStringList>
 #include "command.h"
 
-static QStringList splitCommandLine(const QString & pArgs_str)
+static QStringList splitArgsLine(const QString & pArgs_str)
 {
     QStringList list;
     QString arg;
@@ -30,19 +30,16 @@ static QStringList splitCommandLine(const QString & pArgs_str)
     return list;
 }
 
-void Command::exec(const QString &pArgs)
+void UserInterface::Command::exec(const QString &pArgs)
 {
-
+    QStringList arg_list = splitArgsLine(pArgs);
 }
 
-const QString& Command::getName() const
+const QString& UserInterface::Command::getName() const
 {
     return mName;
 }
 
-void Command::call_cxx_function(const QStringList &pArg_list)
-{
-}
 
 
 

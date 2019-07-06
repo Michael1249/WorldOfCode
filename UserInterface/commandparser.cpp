@@ -1,11 +1,11 @@
 #include "commandparser.h"
 
-void CommandParser::add_command(const Command &pCommand)
+void UserInterface::CommandParser::add_command(const Command &pCommand)
 {
     mCommands.insert(pCommand.getName(), pCommand);
 }
 
-void CommandParser::parse_string(const QString& pCommand_str)
+void UserInterface::CommandParser::parse_string(const QString& pCommand_str)
 {
     //should be owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);

@@ -1,11 +1,12 @@
 #ifndef USERINTERFACE_H
 #define USERINTERFACE_H
 
+#include "commandadapter.h"
 
-class UserInterface
+class Interface
 {
 public:
-    UserInterface();
+    Interface();
 };
 
 #endif // USERINTERFACE_H

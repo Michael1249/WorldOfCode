@@ -1,11 +1,11 @@
 #include <QCoreApplication>
-#include <userinterface.h>
+#include "UserInterface/interface.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    UserInterface interface;
+    Interface interface;
 
     return a.exec();
 }

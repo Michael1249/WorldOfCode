@@ -3,19 +3,36 @@
 
 #include <QString>
 #include <QStringList>
+#include <QVector>
+#include "commandadapter.h"
+
+namespace UserInterface
+{
+
 class Command
 {
 public:
     Command() = default;
-    virtual ~Command() = default;
 
     void exec(const QString& pArgs);
     const QString& getName() const;
 
 private:
-    virtual void call_cxx_function(const QStringList& pArg_list);
+    struct ArgumentInfo
+    {
+        QString help;
+        QString name;
+        QChar opt_name;
+        QString default_value;
+    };
 
     QString mName;
+    QString help;
+    QVector<ArgumentInfo> args_info;
+
+    ICommandAdapter* adapter;
 };
+
+} //UserInterface
 
 #endif // COMMAND_H

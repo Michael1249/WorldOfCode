@@ -6,16 +6,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
-    userinterface.cpp
+    interface.cpp
     commandparser.cpp
     command.cpp
+    commandadapter.cpp
     )
 
-include_directories(StringParser_gen)
-
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
-
-# add_subdirectory(StringParser_gen)
+target_include_directories(${PROJECT_NAME} PUBLIC ${SUPPORT_DIR})
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
-#target_link_libraries(${PROJECT_NAME} StringParser_gen)
+target_link_libraries(${PROJECT_NAME} Support)
+

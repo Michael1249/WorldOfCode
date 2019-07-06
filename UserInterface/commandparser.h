@@ -5,6 +5,9 @@
 #include <QString>
 #include "command.h"
 
+namespace UserInterface
+{
+
 class CommandParser
 {
     using command_map = QMap<QString, Command>;
@@ -18,5 +21,7 @@ public:
 private:
     command_map mCommands;
 };
+
+} // UserInterface
 
 #endif // COMMANDPARSER_H

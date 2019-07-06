@@ -1,18 +1,15 @@
-#include <sstream>
-#include <vector>
 #include "commandparser.h"
 
 void CommandParser::add_command(const Command &pCommand)
 {
-    mCommands.insert({pCommand.getName(), pCommand});
+    mCommands.insert(pCommand.getName(), pCommand);
 }
 
-void CommandParser::parse_string(const std::string& pCommand_str)
+void CommandParser::parse_string(const QString& pCommand_str)
 {
-    std::istringstream parse(pCommand_str);
-
-    std::string command_name;
-    parse >> command_name;
+    //should be owerwrite with stringview, unnececary init new stings
+    QString command_name = pCommand_str.section(" ", 0, 0);
+    QString command_args = pCommand_str.section(" ", 1);
 
     if (command_name != "")
     {
@@ -20,15 +17,7 @@ void CommandParser::parse_string(const std::string& pCommand_str)
 
         if (command_iter != mCommands.end())
         {
-            Command::args_t args;
-
-            std::string temp;
-            while (parse >> temp)
-            {
-                args.push_back(temp);
-            }
-
-            command_iter->second.exec(args);
+            command_iter.value().exec(command_args);
         }
 
     }

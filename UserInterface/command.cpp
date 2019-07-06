@@ -1,76 +1,49 @@
-#include <iostream>
+#include <QStringList>
 #include "command.h"
 
-void Command::exec(const Command::args_t& pArgs)
+static QStringList splitCommandLine(const QString & pArgs_str)
 {
-    Command::arg_values_t arg_values(mArgs_info.size());
-
-    for(size_t i = 0; i < arg_values.size(); ++i)
-    {
-        arg_values[i] = mArgs_info[i].default_value;
+    QStringList list;
+    QString arg;
+    bool escape = false;
+    enum { Idle, Arg, QuotedArg } state = Idle;
+    foreach (QChar const c, pArgs_str) {
+        if (!escape && c == '\\') { escape = true; continue; }
+        switch (state) {
+        case Idle:
+            if (!escape && c == '"') state = QuotedArg;
+            else if (escape || !c.isSpace()) { arg += c; state = Arg; }
+            break;
+        case Arg:
+            if (!escape && c == '"') state = QuotedArg;
+            else if (escape || !c.isSpace()) arg += c;
+            else { list << arg; arg.clear(); state = Idle; }
+            break;
+        case QuotedArg:
+            if (!escape && c == '"') state = arg.isEmpty() ? Idle : Arg;
+            else arg += c;
+            break;
+        }
+        escape = false;
     }
+    if (!arg.isEmpty()) list << arg;
+    return list;
+}
 
-    bool flag_with_name = false;
-    bool flag_execute = true;
-    for (auto& arg : pArgs)
-    {
-
-        if (isNamedArgument(arg))
-        {
-            flag_with_name = true;
-            int32_t arg_pos = getArgPosition(arg);
-
-            if (arg_pos < 0)
-            {
-                std::cout << "[ERROR]: invalid argument name!";
-                flag_execute = false;
-                break;
-            }
-
-            arg_values[static_cast<size_t>(arg_pos)] = extractValue(arg);
-        }
-        else if (isOptionon(arg))
-        {
-            flag_with_name = true;
-            int32_t arg_pos = getOptionPosition(arg[1]);
-
-            if (arg_pos < 0)
-            {
-                std::cout << "[ERROR]: invalid argument name!";
-                flag_execute = false;
-                break;
-            }
-
-            arg_values[static_cast<size_t>(arg_pos)] = extractValue(arg);
-        }
-        else
-        {
-            if(flag_with_name)
-            {
-                std::cout << "[ERROR]: Argument can't be unnamed after any other named!";
-                flag_execute = false;
-                break;
-            }
-
-        }
-
-    }
+void Command::exec(const QString &pArgs)
+{
 
 }
 
-const std::string& Command::getName() const
+const QString& Command::getName() const
 {
     return mName;
 }
 
-bool Command::isOptionon(const Command::arg_t &pArg)
+void Command::call_cxx_function(const QStringList &pArg_list)
 {
-    return pArg[0] == '-' && pArg[2] == '=';
 }
 
-bool Command::isNamedArgument(const Command::arg_t &pArg)
-{
-    return pArg[0] == '-' && pArg[1] == '-';
-}
+
 
 

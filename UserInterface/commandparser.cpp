@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "commandparser.h"
 
 void UserInterface::CommandParser::add_command(const Command &pCommand)
@@ -9,6 +10,7 @@ void UserInterface::CommandParser::parse_string(const QString& pCommand_str)
 {
     //should be owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);
+
     QString command_args = pCommand_str.section(" ", 1);
 
     if (command_name != "")

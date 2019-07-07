@@ -7,6 +7,7 @@ set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
     delegate.h
+    qiostream.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

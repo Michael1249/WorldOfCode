@@ -20,10 +20,16 @@ template <typename T, typename R, typename ...Args>
 class CommandAdapter: public ICommandAdapter
 {
 public:
+    CommandAdapter(T& obj, R (T::*mf)(Args...))
+    {
+        mDelegate = make_delegate(obj, mf);
+    }
+
    void call(QStringList pArg_value_list) = 0;
 private:
-    Support::Delegate<T, R, Args...>* delegate;
+   Support::Delegate<T, R, Args...>* mDelegate;
 };
+
 
 
 

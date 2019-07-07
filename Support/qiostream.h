@@ -1,11 +1,14 @@
 #ifndef QIOSTREAM_H
 #define QIOSTREAM_H
 
+#include<QTextStream>
 
-class Qiostream
+namespace QIO
 {
-public:
-    Qiostream();
-};
+
+extern QTextStream qout;
+extern QTextStream qin;
+
+} // QIO
 
 #endif // QIOSTREAM_H

@@ -1,12 +1,26 @@
-#ifndef USERINTERFACE_H
-#define USERINTERFACE_H
+#ifndef INTERFACE_H
+#define INTERFACE_H
 
-#include "commandadapter.h"
+#include "commandparser.h"
+
+namespace UserInterface
+{
 
 class Interface
 {
 public:
+    static Interface* getInstance();
+    void run();
+private:
     Interface();
+    Interface(const Interface&) = delete;
+    Interface& operator=(Interface&) = delete;
+    static Interface* p_instance;
+
+    CommandParser mParser;
+    bool flag_run_end = false;
 };
 
-#endif // USERINTERFACE_H
+} // UserInterface
+
+#endif // INTERFACE_H

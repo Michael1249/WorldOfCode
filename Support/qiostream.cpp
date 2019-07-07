@@ -1,6 +1,5 @@
 #include "qiostream.h"
 
-Qiostream::Qiostream()
-{
+QTextStream QIO::qin(stdin);
+QTextStream QIO::qout(stdout);
 
-}

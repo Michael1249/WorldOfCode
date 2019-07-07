@@ -8,13 +8,15 @@ find_package(Qt5Core)
 
 get_filename_component(SUPPORT_DIR Support ABSOLUTE)
 
-add_executable(${PROJECT_NAME} "main.cpp")
 add_subdirectory(Support)
 add_subdirectory(Client)
 add_subdirectory(Server)
 add_subdirectory(UserInterface)
 
+add_executable(${PROJECT_NAME} "main.cpp")
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core)
-target_link_libraries(${PROJECT_NAME} UserInterface)
+target_link_libraries(${PROJECT_NAME}
+    Qt5::Core
+    UserInterface
+    )
 

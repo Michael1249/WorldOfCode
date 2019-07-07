@@ -5,7 +5,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Interface interface;
+    UserInterface::Interface::getInstance()->run();
+
+//    auto i = UserInterface::Interface();
+//    i.run();
 
     return a.exec();
 }

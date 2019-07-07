@@ -27,10 +27,10 @@ private:
     };
 
     QString mName;
-    QString help;
-    QVector<ArgumentInfo> args_info;
+    QString mHelp;
+    QVector<ArgumentInfo> mArgs_info;
 
-    ICommandAdapter* adapter;
+    ICommandAdapter* mAdapter;
 };
 
 } //UserInterface

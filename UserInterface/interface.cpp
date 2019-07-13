@@ -2,11 +2,25 @@
 #include "qiostream.h"
 #include "interface.h"
 
+class Target
+{
+public:
+    void foo(QString s)
+    {
+        QIO::qout << "This is Target::foo\n"
+                  << "Your argument: "
+                  << s
+                  << '\n';
+        QIO::qout.flush();
+    }
+};
+
+Target target;
+
 UserInterface::Interface* UserInterface::Interface::p_instance = nullptr;
 
 UserInterface::Interface::Interface()
 {
-
 }
 
 UserInterface::Interface *UserInterface::Interface::getInstance()

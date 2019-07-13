@@ -17,9 +17,9 @@ class Delegate {
 };
 
 template <typename T, typename R, typename ...Args>
-Delegate<T, R, Args...> make_delegate(T& obj, R (T::*mf)(Args...))
+Delegate<T, R, Args...>* new_delegate(T& obj, R (T::*mf)(Args...))
 {
-    return {obj, mf};
+    return new Delegate<T, R, Args...>(obj, mf);
 }
 
 } // Support

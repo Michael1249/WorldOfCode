@@ -1,4 +1,4 @@
-#include <QDebug>
+#include "qiostream.h"
 #include "commandparser.h"
 
 void UserInterface::CommandParser::add_command(const Command &pCommand)
@@ -20,6 +20,11 @@ void UserInterface::CommandParser::parse_string(const QString& pCommand_str)
         if (command_iter != mCommands.end())
         {
             command_iter.value().exec(command_args);
+        }
+        else
+        {
+            QIO::qout << "[ERROR]: Unknown command!\n";
+            QIO::qout.flush();
         }
 
     }

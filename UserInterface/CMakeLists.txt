@@ -9,7 +9,7 @@ set(SOURCES
     interface.cpp
     commandparser.cpp
     command.cpp
-    commandadapter.cpp
+    #commandadapter.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

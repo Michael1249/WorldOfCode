@@ -8,23 +8,29 @@
 
 namespace UserInterface
 {
-
+class ICommandAdapter{};
 class Command
 {
 public:
-    Command() = default;
+    struct ArgumentInfo
+    {
+        QString name;
+        QChar opt_name;
+        QString help;
+        QString default_value;
+    };
+
+
+    Command(const QString& pName,
+            const QString& pHelp,
+            const QVector<ArgumentInfo>& pArgs_info,
+            ICommandAdapter* pAdapter);
 
     void exec(const QString& pArgs);
     const QString& getName() const;
 
 private:
-    struct ArgumentInfo
-    {
-        QString help;
-        QString name;
-        QChar opt_name;
-        QString default_value;
-    };
+    QStringList splitArgsLine(const QString & pArgs_str);
 
     QString mName;
     QString mHelp;

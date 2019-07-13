@@ -1,7 +1,33 @@
 #include <QStringList>
 #include "command.h"
 
-static QStringList splitArgsLine(const QString & pArgs_str)
+namespace UserInterface
+{
+
+Command::Command(const QString &pName,
+                 const QString &pHelp,
+                 const QVector<Command::ArgumentInfo> &pArgs_info,
+                 ICommandAdapter* pAdapter):
+    mName(pName),
+    mHelp(pHelp),
+    mArgs_info(pArgs_info),
+    mAdapter(pAdapter)
+{
+
+}
+
+void Command::exec(const QString &pArgs)
+{
+    QStringList arg_list = splitArgsLine(pArgs);
+    //mAdapter->call(arg_list);
+}
+
+const QString& Command::getName() const
+{
+    return mName;
+}
+
+QStringList Command::splitArgsLine(const QString &pArgs_str)
 {
     QStringList list;
     QString arg;
@@ -30,17 +56,4 @@ static QStringList splitArgsLine(const QString & pArgs_str)
     return list;
 }
 
-void UserInterface::Command::exec(const QString &pArgs)
-{
-    QStringList arg_list = splitArgsLine(pArgs);
-}
-
-const QString& UserInterface::Command::getName() const
-{
-    return mName;
-}
-
-
-
-
-
+} // UserInterface

@@ -5,6 +5,9 @@ project(WorldOfCode VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Core)
+find_package(Qt5Network REQUIRED)
+
+include_directories(${Qt5Network_INCLUDE_DIRS})
 
 get_filename_component(SUPPORT_DIR Support ABSOLUTE)
 
@@ -17,6 +20,7 @@ add_executable(${PROJECT_NAME} "main.cpp")
 
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
+    Qt5::Network
     UserInterface
     )
 

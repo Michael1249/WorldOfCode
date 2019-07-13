@@ -10,9 +10,9 @@ namespace UserInterface
 
 class CommandParser
 {
+public:
     using command_map = QMap<QString, Command>;
 
-public:
     CommandParser() = default;
 
     void add_command(const Command& pCommand);

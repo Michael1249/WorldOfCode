@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.0.0)
 
 project(Support)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-
 set(SOURCES
     delegate.h
     qiostream.cpp

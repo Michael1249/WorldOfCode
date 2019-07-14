@@ -7,19 +7,19 @@ namespace UserInterface
 Command::Command(const QString &pName,
                  const QString &pHelp,
                  const QVector<Command::ArgumentInfo> &pArgs_info,
-                 ICommandAdapter* pAdapter):
+                 Command::Delegate_ptr_t pAdapter):
     mName(pName),
     mHelp(pHelp),
     mArgs_info(pArgs_info),
-    mAdapter(pAdapter)
+    mAdapter(std::move(pAdapter))
 {
 
 }
 
-void Command::exec(const QString &pArgs)
+void Command::exec(const QString &pArgs) const
 {
     QStringList arg_list = splitArgsLine(pArgs);
-    //mAdapter->call(arg_list);
+    mAdapter.get()->Invoke(arg_list);
 }
 
 const QString& Command::getName() const

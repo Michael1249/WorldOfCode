@@ -15,6 +15,11 @@ private:
     Interface();
     Interface(const Interface&) = delete;
     Interface& operator=(Interface&) = delete;
+
+    friend class UserCommand;
+    void addCommand(const Command& pCommand);
+    void removeCommand(const Command& pCommand);
+
     static Interface* p_instance;
 
     CommandParser mParser;

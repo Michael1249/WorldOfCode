@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QString>
+#include <memory.h>
 #include "command.h"
 
 namespace UserInterface
@@ -11,12 +12,13 @@ namespace UserInterface
 class CommandParser
 {
 public:
-    using command_map = QMap<QString, Command>;
+    using command_map = QMap<QString,const Command*>;
 
     CommandParser() = default;
 
-    void add_command(const Command& pCommand);
-    void parse_string(const QString& pCommand_str);
+    void addCommand(const Command& pCommand);
+    void removeCommand(const Command& pCommand);
+    void parseString(const QString& pCommand_str);
 
 private:
     command_map mCommands;

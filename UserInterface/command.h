@@ -4,14 +4,16 @@
 #include <QString>
 #include <QStringList>
 #include <QVector>
+#include <memory.h>
 #include "commandadapter.h"
+
 
 namespace UserInterface
 {
-class ICommandAdapter{};
 class Command
 {
 public:
+    using Delegate_ptr_t = std::unique_ptr<ICommandDelegate>;
     struct ArgumentInfo
     {
         QString name;
@@ -24,19 +26,19 @@ public:
     Command(const QString& pName,
             const QString& pHelp,
             const QVector<ArgumentInfo>& pArgs_info,
-            ICommandAdapter* pAdapter);
+            Delegate_ptr_t pAdapter);
 
-    void exec(const QString& pArgs);
+    void exec(const QString& pArgs) const;
     const QString& getName() const;
 
 private:
-    QStringList splitArgsLine(const QString & pArgs_str);
+    static QStringList splitArgsLine(const QString & pArgs_str);
 
     QString mName;
     QString mHelp;
     QVector<ArgumentInfo> mArgs_info;
 
-    ICommandAdapter* mAdapter;
+    Delegate_ptr_t mAdapter;
 };
 
 } //UserInterface

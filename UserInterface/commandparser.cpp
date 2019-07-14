@@ -1,12 +1,17 @@
 #include "qiostream.h"
 #include "commandparser.h"
 
-void UserInterface::CommandParser::add_command(const Command &pCommand)
+void UserInterface::CommandParser::addCommand(const Command &pCommand)
 {
-    mCommands.insert(pCommand.getName(), pCommand);
+    mCommands.insert(pCommand.getName(), &pCommand);
 }
 
-void UserInterface::CommandParser::parse_string(const QString& pCommand_str)
+void UserInterface::CommandParser::removeCommand(const UserInterface::Command &pCommand)
+{
+    mCommands.remove(pCommand.getName());
+}
+
+void UserInterface::CommandParser::parseString(const QString& pCommand_str)
 {
     //should be owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);
@@ -19,7 +24,7 @@ void UserInterface::CommandParser::parse_string(const QString& pCommand_str)
 
         if (command_iter != mCommands.end())
         {
-            command_iter.value().exec(command_args);
+            command_iter.value()->exec(command_args);
         }
         else
         {

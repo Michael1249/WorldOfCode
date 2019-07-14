@@ -2,25 +2,20 @@
 #include "qiostream.h"
 #include "interface.h"
 
-class Target
-{
-public:
-    void foo(QString s)
-    {
-        QIO::qout << "This is Target::foo\n"
-                  << "Your argument: "
-                  << s
-                  << '\n';
-        QIO::qout.flush();
-    }
-};
-
-Target target;
-
 UserInterface::Interface* UserInterface::Interface::p_instance = nullptr;
 
 UserInterface::Interface::Interface()
 {
+}
+
+void UserInterface::Interface::addCommand(const UserInterface::Command &pCommand)
+{
+    mParser.addCommand(pCommand);
+}
+
+void UserInterface::Interface::removeCommand(const UserInterface::Command &pCommand)
+{
+    mParser.removeCommand(pCommand);
 }
 
 UserInterface::Interface *UserInterface::Interface::getInstance()
@@ -42,7 +37,7 @@ void UserInterface::Interface::run()
 
         QString args_str = qin.readLine();
 
-        mParser.parse_string(args_str);
+        mParser.parseString(args_str);
     }
 
 }

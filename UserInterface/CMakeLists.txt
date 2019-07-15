@@ -10,7 +10,7 @@ set(SOURCES
     commandparser.cpp
     command.cpp
     usercommand.cpp
-    #commandadapter.cpp
+    usercommandpack.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

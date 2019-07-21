@@ -3,16 +3,17 @@
 
 #include "commandparser.h"
 
-namespace UserInterface
+namespace UI
 {
-
+namespace API
+{
 class Interface
 {
 public:
     static Interface* getInstance();
     void run();
 private:
-    Interface();
+    Interface() = default;
     Interface(const Interface&) = delete;
     Interface& operator=(Interface&) = delete;
 
@@ -20,12 +21,13 @@ private:
     void addCommand(const Command& pCommand);
     void removeCommand(const Command& pCommand);
 
-    static Interface* p_instance;
-
     CommandParser mParser;
-    bool flag_run_end = false;
+    bool mFlag_run_end = false;
 };
 
-} // UserInterface
+void Run();
+
+} // API
+} // UI
 
 #endif // INTERFACE_H

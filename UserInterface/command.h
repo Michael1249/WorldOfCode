@@ -7,38 +7,41 @@
 #include <memory.h>
 #include "commandadapter.h"
 
-
-namespace UserInterface
+namespace UI
 {
 class Command
 {
 public:
-    using Delegate_ptr_t = std::unique_ptr<ICommandDelegate>;
-    struct ArgumentInfo
+    struct ArgInfo
     {
-        QString name;
-        QChar opt_name;
-        QString help;
-        QString default_value;
+        QString arg_name;
+        QChar arg_short_name;
+        QString help_tip = "";
+        QString default_value = "";
+
     };
 
-
-    Command(const QString& pName,
-            const QString& pHelp,
-            const QVector<ArgumentInfo>& pArgs_info,
-            Delegate_ptr_t pAdapter);
+    Command(std::unique_ptr<ICommandDelegate> pAdapter,
+            const QString& pName,
+            const QList<ArgInfo>& pSignature,
+            const QString& pHelp_tip);
 
     void exec(const QString& pArgs) const;
+
+    void setEnable(bool pEnable);
+    bool isEnable();
+
     const QString& getName() const;
 
 private:
     static QStringList splitArgsLine(const QString & pArgs_str);
+    QStringList parse(const QStringList& args_list) const;
 
     QString mName;
-    QString mHelp;
-    QVector<ArgumentInfo> mArgs_info;
-
-    Delegate_ptr_t mAdapter;
+    QString mHelp_tip;
+    bool mIs_enable = true;
+    QList<ArgInfo> mSignature;
+    std::unique_ptr<ICommandDelegate> mAdapter;
 };
 
 } //UserInterface

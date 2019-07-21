@@ -1,36 +1,33 @@
 #include <QTextStream>
 #include "qiostream.h"
+#include "userstdcommands.h"
 #include "interface.h"
 
-UserInterface::Interface* UserInterface::Interface::p_instance = nullptr;
-
-UserInterface::Interface::Interface()
+namespace UI
 {
-}
+namespace API
+{
 
-void UserInterface::Interface::addCommand(const UserInterface::Command &pCommand)
+void Interface::addCommand(const Command &pCommand)
 {
     mParser.addCommand(pCommand);
 }
 
-void UserInterface::Interface::removeCommand(const UserInterface::Command &pCommand)
+void Interface::removeCommand(const Command &pCommand)
 {
     mParser.removeCommand(pCommand);
 }
 
-UserInterface::Interface *UserInterface::Interface::getInstance()
+Interface *Interface::getInstance()
 {
-    if (nullptr == p_instance)
-    {
-        p_instance = new Interface();
-    }
+    static Interface* p_instance = new Interface();
     return p_instance;
 }
 
-void UserInterface::Interface::run()
+void Interface::run()
 {
     using namespace QIO;
-    while (!flag_run_end)
+    while (!mFlag_run_end)
     {
         qout << ">>>";
         qout.flush();
@@ -42,3 +39,11 @@ void UserInterface::Interface::run()
 
 }
 
+void Run()
+{
+    UserStdCommands std_commands;
+    Interface::getInstance()->run();
+}
+
+} // API
+} // UI

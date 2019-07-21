@@ -1,15 +1,24 @@
+#include "interface.h"
 #include "usercommand.h"
 
-UserInterface::UserCommand::UserCommand(const QString &pName,
-                                        const QString &pHelp,
-                                        const QVector<UserInterface::Command::ArgumentInfo> &pArgs_info,
-                                        UserInterface::Command::Delegate_ptr_t pAdapter):
-    Command (pName, pHelp, pArgs_info, std::move(pAdapter))
+namespace UI
 {
-    UserInterface::Interface::getInstance()->addCommand(*this);
+namespace API
+{
+
+UserCommand::UserCommand(std::unique_ptr<ICommandDelegate> pAdapter,
+                                        const QString &pName,
+                                        const QList<ArgInfo>& pSignature,
+                                        const QString& pHelp_tip):
+    Command (std::move(pAdapter), pName, pSignature, pHelp_tip)
+{
+    Interface::getInstance()->addCommand(*this);
 }
 
-UserInterface::UserCommand::~UserCommand()
+UserCommand::~UserCommand()
 {
-    UserInterface::Interface::getInstance()->removeCommand(*this);
+    Interface::getInstance()->removeCommand(*this);
 }
+
+} // API
+} // UI

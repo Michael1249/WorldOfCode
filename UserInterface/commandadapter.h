@@ -3,7 +3,7 @@
 
 #include <QStringList>
 #include <memory>
-namespace UserInterface
+namespace UI
 {
 
 /*

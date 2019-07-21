@@ -6,7 +6,7 @@
 #include <memory.h>
 #include "command.h"
 
-namespace UserInterface
+namespace UI
 {
 
 class CommandParser

@@ -2,21 +2,24 @@
 #define USERCOMMAND_H
 
 #include "command.h"
-#include "interface.h"
 
-namespace UserInterface
+namespace UI
 {
+namespace API
+{
+
 
 class UserCommand: public Command
 {
 public:
-    UserCommand(const QString& pName,
-                const QString& pHelp,
-                const QVector<ArgumentInfo>& pArgs_info,
-                Delegate_ptr_t pAdapter);
+    UserCommand(std::unique_ptr<ICommandDelegate> pAdapter,
+                const QString& pName,
+                const QList<ArgInfo>& pSignature,
+                const QString& pHelp_tip);
     ~UserCommand();
 };
 
-} //UserInterface
+} // API
+} // UI
 
 #endif // USERCOMMAND_H

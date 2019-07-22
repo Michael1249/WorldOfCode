@@ -35,3 +35,23 @@ void UI::CommandParser::parseString(const QString& pCommand_str)
     }
 
 }
+
+const UI::CommandParser::command_map &UI::CommandParser::getCommands() const
+{
+    return mCommands;
+}
+
+UI::CommandParser::command_map UI::CommandParser::getActiveCommands() const
+{
+    command_map result;
+    for(auto command : mCommands)
+    {
+
+        if(command->isEnable())
+        {
+            result.insert(command->getName(), command);
+        }
+
+    }
+    return result;
+}

@@ -20,6 +20,9 @@ public:
     void removeCommand(const Command& pCommand);
     void parseString(const QString& pCommand_str);
 
+    const command_map& getCommands() const;
+    command_map getActiveCommands() const;
+
 private:
     command_map mCommands;
 };

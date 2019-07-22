@@ -22,9 +22,9 @@ public:
         getCommandDelegate(*this, &UserStdCommands::help_request),
         "help",
         {
-            {"cmd", 'c'}
+            {"filter", 'f'}
         },
-        ""
+        "helps to find command and get discription"
     };
 };
 

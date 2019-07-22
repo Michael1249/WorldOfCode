@@ -1,4 +1,5 @@
 #include <QStringList>
+#include <QtDebug>
 #include "command.h"
 
 namespace UI
@@ -22,7 +23,7 @@ void Command::exec(const QString &pArgs) const
     if(mIs_enable)
     {
         QStringList arg_list = splitArgsLine(pArgs);
-        QStringList val_list = parse(arg_list);
+        QVector<QString> val_list = parse(arg_list);
 
         mAdapter.get()->Invoke(val_list);
     }
@@ -34,7 +35,7 @@ void Command::setEnable(bool pEnable)
     mIs_enable = pEnable;
 }
 
-bool Command::isEnable()
+bool Command::isEnable() const
 {
     return mIs_enable;
 }
@@ -42,6 +43,11 @@ bool Command::isEnable()
 const QString& Command::getName() const
 {
     return mName;
+}
+
+const QString &Command::getHelpTip() const
+{
+    return mHelp_tip;
 }
 
 QStringList Command::splitArgsLine(const QString &pArgs_str)
@@ -87,12 +93,12 @@ QString removeBrackets(const QString& pStr)
     return result;
 }
 
-QStringList Command::parse(const QStringList &args_list) const
+QVector<QString> Command::parse(const QStringList &args_list) const
 {
-    QStringList vals_list;
-    QList<bool> setted_vals;
-    vals_list.reserve(mSignature.size());
-    setted_vals.reserve(mSignature.size());
+    QVector<QString> vals_list;
+    QVector<bool> setted_vals;
+    vals_list.resize(mSignature.size());
+    setted_vals.resize(mSignature.size());
     bool ban_positional = false;
 
     for (int i = 0; i < args_list.size(); ++i)
@@ -116,8 +122,8 @@ QStringList Command::parse(const QStringList &args_list) const
             }
             if(arg_pos != -1)
             {
-                vals_list.insert(arg_pos, val.size() ? removeBrackets(val) : mSignature[arg_pos].default_value);
-                setted_vals.insert(arg_pos, true);
+                vals_list[arg_pos] = val.size() ? removeBrackets(val) : mSignature[arg_pos].default_value;
+                setted_vals[arg_pos] = true;
             }
             else
             {
@@ -130,8 +136,8 @@ QStringList Command::parse(const QStringList &args_list) const
         {
             if(!ban_positional)
             {
-                vals_list.insert(i, current_arg.size() ? removeBrackets(current_arg) : mSignature[i].default_value);
-                setted_vals.insert(i, true);
+                vals_list[i] = current_arg.size() ? removeBrackets(current_arg) : mSignature[i].default_value;
+                setted_vals[i] = true;
             }
             else
             {
@@ -143,7 +149,7 @@ QStringList Command::parse(const QStringList &args_list) const
     for (int i = 0; i < setted_vals.size(); ++i)
     {
         if(!setted_vals[i])
-            vals_list.insert(i, mSignature[i].default_value);
+            vals_list[i] = mSignature[i].default_value;
     }
 
     return vals_list;

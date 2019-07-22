@@ -79,7 +79,7 @@ auto getMemFuncAdapterDelegate(obj_t& obj, ret_val_t(obj_t::*mem_func_ptr)(mem_f
 class ICommandDelegate
 {
 public:
-    virtual void Invoke(const QStringList&) = 0;
+    virtual void Invoke(const QVector<QString>&) = 0;
     virtual ~ICommandDelegate() = default;
 };
 
@@ -94,7 +94,7 @@ public:
 
     }
 
-    void Invoke(const QStringList& args) override
+    void Invoke(const QVector<QString>& args) override
     {
         MemFuncAdapterDelegate<obj_t, ret_val_t, mem_func_args_t...>::Invoke(args);
     }

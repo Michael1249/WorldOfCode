@@ -29,13 +29,14 @@ public:
     void exec(const QString& pArgs) const;
 
     void setEnable(bool pEnable);
-    bool isEnable();
+    bool isEnable() const;
 
     const QString& getName() const;
+    const QString& getHelpTip() const;
 
 private:
     static QStringList splitArgsLine(const QString & pArgs_str);
-    QStringList parse(const QStringList& args_list) const;
+    QVector<QString> parse(const QStringList& args_list) const;
 
     QString mName;
     QString mHelp_tip;

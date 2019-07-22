@@ -33,6 +33,8 @@ public:
 
     const QString& getName() const;
     const QString& getHelpTip() const;
+    const QList<ArgInfo>& getArgumentsInfo() const;
+    bool hasHelpTip() const;
 
 private:
     static QStringList splitArgsLine(const QString & pArgs_str);

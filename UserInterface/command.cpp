@@ -50,6 +50,16 @@ const QString &Command::getHelpTip() const
     return mHelp_tip;
 }
 
+const QList<Command::ArgInfo> &Command::getArgumentsInfo() const
+{
+    return mSignature;
+}
+
+bool Command::hasHelpTip() const
+{
+    return mHelp_tip.size();
+}
+
 QStringList Command::splitArgsLine(const QString &pArgs_str)
 {
     QStringList list;

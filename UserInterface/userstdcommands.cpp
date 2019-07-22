@@ -1,44 +1,53 @@
+#include <algorithm>
 #include "interface.h"
 #include "qiostream.h"
 #include "userstdcommands.h"
 
 void UI::API::UserStdCommands::help_request(const QString &pStr)
 {
-    QStringList result_output;
-    auto commands = UI::API::Interface::getInstance()->getParser().getCommands();
-    int max_length = 0;
+      auto command_map = UI::API::Interface::getInstance()->getParser().getCommands();
 
-    for(auto command : commands)
-    {
-        int curr_length = command->getName().size();
+      command_map.erase(std::remove_if(command_map.begin(), command_map.end(),
+                     [pStr](auto command)
+                     {
+                        return !command->getName().contains(pStr, Qt::CaseInsensitive);
+                     }));
 
-        if(max_length < curr_length)
-        {
-            max_length = curr_length;
-        }
+      if (command_map.size() == 0)
+      {
 
-    }
+      }
+      else if(command_map.size() == 1)
+      {
+          auto command = command_map.begin().value();
+          QIO::qout << command->getName();
+          if(command->hasHelpTip())
+          {
+              QIO::qout << qSetFieldWidth(20) << ": " << command->getHelpTip() << qSetFieldWidth(0);
+          }
+          QIO::qout << '\n';
+          for (auto& arg : command->getArgumentsInfo())
+          {
+              QIO::qout << QString("[%1, %2] = \"%3\"").arg(arg.arg_name).arg(arg.arg_short_name).arg(arg.default_value)
+                        << qSetFieldWidth(20)
+                        << ": "
+                        << arg.help_tip
+                        << qSetFieldWidth(0)
+                        << '\n';
+          }
+      }
+      else
+      {
+          for(auto command : command_map)
+          {
+              QIO::qout << command->getName();
+              if(command->hasHelpTip())
+              {
+                  QIO::qout << qSetFieldWidth(16) << ": " << command->getHelpTip() << qSetFieldWidth(0);
+              }
+              QIO::qout << '\n';
+          }
+      }
 
-    for(auto command : commands)
-    {
-        auto& name = command->getName();
-        if(name.contains(pStr, Qt::CaseInsensitive))
-        {
-            if(command->getHelpTip().size())
-            {
-                result_output << name + QString(max_length - name.size(), ' ') + " : " + command->getHelpTip();
-            }
-            else
-            {
-                result_output << command->getName();
-            }
-        }
-    }
-    result_output.sort();
-    for(auto& str : result_output)
-    {
-        QIO::qout << str << '\n';
-    }
     QIO::qout.flush();
-
 }

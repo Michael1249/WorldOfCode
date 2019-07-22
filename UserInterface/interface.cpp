@@ -39,9 +39,14 @@ void Interface::run()
 
 }
 
+const CommandParser &Interface::getParser()
+{
+    return mParser;
+}
+
 void Run()
 {
-    UserStdCommands std_commands;
+    static UserStdCommands std_commands;
     Interface::getInstance()->run();
 }
 

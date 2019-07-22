@@ -12,12 +12,14 @@ class Interface
 public:
     static Interface* getInstance();
     void run();
+    const CommandParser& getParser();
 private:
+    friend class UserCommand;
+
     Interface() = default;
     Interface(const Interface&) = delete;
     Interface& operator=(Interface&) = delete;
 
-    friend class UserCommand;
     void addCommand(const Command& pCommand);
     void removeCommand(const Command& pCommand);
 

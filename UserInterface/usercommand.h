@@ -14,8 +14,8 @@ class UserCommand: public Command
 public:
     UserCommand(std::unique_ptr<ICommandDelegate> pAdapter,
                 const QString& pName,
-                const QList<ArgInfo>& pSignature,
-                const QString& pHelp_tip);
+                const QList<ArgInfo>& pSignature = {},
+                const QString& pHelp_tip = "");
     ~UserCommand();
 };
 

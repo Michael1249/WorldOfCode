@@ -1,6 +1,8 @@
 #include "tebleraw.h"
 
-TebleRaw::TebleRaw()
+
+TebleRaw::TebleRaw(size_t pWidth):
+    mWidth(pWidth)
 {
 
 }

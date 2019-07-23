@@ -1,11 +1,12 @@
 #include <algorithm>
 #include "interface.h"
 #include "qiostream.h"
+#include "table.h"
 #include "userstdcommands.h"
 
-void UI::API::UserStdCommands::help_request(const QString &pStr)
+void UI::User::UserStdCommands::help_request(const QString &pStr)
 {
-      auto command_map = UI::API::Interface::getInstance()->getParser().getCommands();
+      auto command_map = UI::User::Interface::getInstance()->getParser().getCommands();
 
       command_map.erase(std::remove_if(command_map.begin(), command_map.end(),
                      [pStr](auto command)
@@ -26,15 +27,16 @@ void UI::API::UserStdCommands::help_request(const QString &pStr)
               QIO::qout << qSetFieldWidth(20) << ": " << command->getHelpTip() << qSetFieldWidth(0);
           }
           QIO::qout << '\n';
-          for (auto& arg : command->getArgumentsInfo())
+          QIO::Table table(" : ", 2);
+          for (auto& arg: command->getArgumentsInfo())
           {
-              QIO::qout << QString("[%1, %2] = \"%3\"").arg(arg.arg_name).arg(arg.arg_short_name).arg(arg.default_value)
-                        << qSetFieldWidth(20)
-                        << ": "
-                        << arg.help_tip
-                        << qSetFieldWidth(0)
-                        << '\n';
+              table[0] << QString("[%1, %2] = %3")
+                          .arg(arg.arg_name)
+                          .arg(arg.arg_short_name)
+                          .arg(arg.default_value);
+              table[1] << arg.help_tip;
           }
+          QIO::qout << table;
       }
       else
       {

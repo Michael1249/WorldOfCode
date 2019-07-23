@@ -5,7 +5,7 @@
 
 namespace UI
 {
-namespace API
+namespace User
 {
 
 void Interface::addCommand(const Command &pCommand)

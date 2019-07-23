@@ -3,7 +3,7 @@
 
 namespace UI
 {
-namespace API
+namespace User
 {
 
 UserCommand::UserCommand(std::unique_ptr<ICommandDelegate> pAdapter,

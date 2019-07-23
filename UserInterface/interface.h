@@ -5,7 +5,7 @@
 
 namespace UI
 {
-namespace API
+namespace User
 {
 class Interface
 {

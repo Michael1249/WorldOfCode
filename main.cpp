@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    UI::API::Run();
+    UI::User::Run();
 
     return a.exec();
 }

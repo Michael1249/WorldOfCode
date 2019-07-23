@@ -8,7 +8,7 @@
 
 namespace UI
 {
-namespace API
+namespace User
 {
 
 class UserStdCommands

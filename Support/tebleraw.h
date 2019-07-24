@@ -6,10 +6,11 @@
 class TebleRaw : public QStringList
 {
 public:
-    TebleRaw(size_t pWidth = 0);
-
+    TebleRaw(int pWidth = 0);
+    int getWidth() const;
+    void setWidth(int pWidth);
 private:
-    size_t mWidth;
+    int mWidth;
 };
 
 #endif // TEBLERAW_H

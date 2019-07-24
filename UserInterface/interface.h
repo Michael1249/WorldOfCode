@@ -20,8 +20,8 @@ private:
     Interface(const Interface&) = delete;
     Interface& operator=(Interface&) = delete;
 
-    void addCommand(const Command& pCommand);
-    void removeCommand(const Command& pCommand);
+    void addCommand(const UserCommand& pCommand);
+    void removeCommand(const UserCommand& pCommand);
 
     CommandParser mParser;
     bool mFlag_run_end = false;

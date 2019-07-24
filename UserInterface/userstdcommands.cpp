@@ -1,7 +1,5 @@
-#include <algorithm>
 #include "interface.h"
 #include "qiostream.h"
-#include "table.h"
 #include "userstdcommands.h"
 
 void UI::User::UserStdCommands::help_request(const QString &pStr)
@@ -16,38 +14,53 @@ void UI::User::UserStdCommands::help_request(const QString &pStr)
 
       if (command_map.size() == 0)
       {
-
+          QIO::qout << "Nothing found" << endl;
       }
       else if(command_map.size() == 1)
       {
           auto command = command_map.begin().value();
           QIO::qout << command->getName();
-          if(command->hasHelpTip())
-          {
-              QIO::qout << qSetFieldWidth(20) << ": " << command->getHelpTip() << qSetFieldWidth(0);
-          }
-          QIO::qout << '\n';
-          QIO::Table table(" : ", 2);
+
           for (auto& arg: command->getArgumentsInfo())
           {
-              table[0] << QString("[%1, %2] = %3")
-                          .arg(arg.arg_name)
-                          .arg(arg.arg_short_name)
-                          .arg(arg.default_value);
-              table[1] << arg.help_tip;
+              QIO::qout << QString(" <%1>").arg(arg.arg_name);
           }
-          QIO::qout << table;
+
+          QIO::qout << endl;
+
+          if(command->hasHelpTip())
+          {
+              QIO::qout << command->getHelpTip() << endl;
+          }
+
+          QIO::qout << left;
+
+          for (auto& arg: command->getArgumentsInfo())
+          {
+              QIO::qout << QString("<%1, %2> = \"%3\"")
+                           .arg(arg.arg_name)
+                           .arg(arg.arg_short_name)
+                           .arg(arg.default_value)
+                        << endl
+                        << arg.help_tip
+                        << endl;
+          }
+
       }
       else
       {
           for(auto command : command_map)
           {
-              QIO::qout << command->getName();
+              QIO::qout << qSetFieldWidth(12)
+                        << left
+                        << command->getName();
               if(command->hasHelpTip())
               {
-                  QIO::qout << qSetFieldWidth(16) << ": " << command->getHelpTip() << qSetFieldWidth(0);
+                  QIO::qout << qSetFieldWidth(0)
+                            << " : "
+                            << command->getHelpTip();
               }
-              QIO::qout << '\n';
+              QIO::qout << endl;
           }
       }
 

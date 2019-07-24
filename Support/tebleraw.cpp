@@ -1,8 +1,18 @@
 #include "tebleraw.h"
 
 
-TebleRaw::TebleRaw(size_t pWidth):
+TebleRaw::TebleRaw(int pWidth):
     mWidth(pWidth)
 {
 
+}
+
+int TebleRaw::getWidth() const
+{
+    return mWidth;
+}
+
+void TebleRaw::setWidth(int pWidth)
+{
+    mWidth = pWidth;
 }

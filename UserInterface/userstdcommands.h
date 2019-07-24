@@ -22,9 +22,15 @@ public:
         getCommandDelegate(*this, &UserStdCommands::help_request),
         "help",
         {
-            {"filter", 'f'}
+            {
+                "filter",
+                'f',
+                "search for commands which contain <filter>,\n"
+                "show command's details if it's found."
+            }
         },
-        "helps to find command and get discription"
+        "helps to find command and get discription",
+        false
     };
 };
 

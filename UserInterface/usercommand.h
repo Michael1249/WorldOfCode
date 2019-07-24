@@ -15,8 +15,14 @@ public:
     UserCommand(std::unique_ptr<ICommandDelegate> pAdapter,
                 const QString& pName,
                 const QList<ArgInfo>& pSignature = {},
-                const QString& pHelp_tip = "");
+                const QString& pHelp_tip = "",
+                bool pTrack_enable_state = true);
     ~UserCommand();
+
+    void setEnable(bool pEnable);
+
+private:
+    bool mFlag_track_enable_state;
 };
 
 } // API

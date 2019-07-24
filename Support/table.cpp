@@ -13,32 +13,52 @@ Table::Table(const QString& pDelimeter, int pSize):
 
 QTextStream &operator<<(QTextStream &pOut, const Table &pTable)
 {
-    QVector<TebleRaw::const_iterator> iters(pTable.size());
-    QVector<TebleRaw::const_iterator> iters_end(pTable.size());
-    std::transform(pTable.begin(), pTable.end(), iters.begin(), [](auto& raw){return raw.begin();});
-    std::transform(pTable.begin(), pTable.end(), iters.begin(), [](auto& raw){return raw.end();});
-    pOut << iters[0].i->t();
-    bool flag_end = false;
+    QList<QPair<TebleRaw::const_iterator,TebleRaw::const_iterator>> iterator_pairs;
+    QVector<int> widths;
+    widths.reserve(pTable.size());
 
+    for(auto& raw : pTable)
+    {
+        iterator_pairs.append({raw.begin(), raw.end()});
+        widths.push_back(raw.getWidth());
+    }
+
+    bool flag_end = false;
     while (!flag_end)
     {
-
-        for(auto iter : iters)
-        {
-            //pOut << *iter << pTable.mDelimeter;
-        }
-        pOut << endl;
         flag_end = true;
-//        for (int i = 0; i < iters.size(); ++i)
-//        {
-//            if(iters[i] != iters_end[i])
-//            {
-//                flag_end = false;
-//            }
-//            ++iters[i];
-//        }
+        int counter = 0;
+        //bool flag_to_next_line = false;
+        //QStringList next_line;
+
+        for (auto& pair: iterator_pairs)
+        {
+            int current_width = widths[counter];
+            if(counter)
+            {
+                pOut << qSetFieldWidth(pTable.mDelimeter.size()) << pTable.mDelimeter;
+            }
+
+            pOut << qSetFieldWidth(current_width);
+            if(pair.first != pair.second)
+            {
+                flag_end = false;
+                ++pair.first;
+                //QStringRef current_out(&(*pair.first), 0, current_width);
+                //QStringRef next_line_out(&(*pair.first), current_width, pair.first->size() - current_width);
+
+                //pOut << current_out;
+            }
+            else
+            {
+
+            }
+            pOut << endl;
+            ++counter;
+        }
 
     }
+
 
     return pOut;
 }

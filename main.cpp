@@ -10,9 +10,9 @@ class TestComponent
         QIO::qout << __FUNCTION__ << " : " << pStr << endl;
     }
 
-    UI::User::UserCommand cmd_foo =
+    UI::User::Command cmd_foo =
     {
-        UI::getCommandDelegate(*this, &TestComponent::foo),
+        UI::getCommandDelegate(this, &TestComponent::foo),
         "test.foo",
         {
             {"str", 's'}

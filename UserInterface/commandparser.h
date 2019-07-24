@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QString>
 #include <memory.h>
-#include "usercommand.h"
+#include "command.h"
 
 namespace UI
 {
@@ -12,12 +12,12 @@ namespace UI
 class CommandParser
 {
 public:
-    using command_map = QMap<QString,const User::UserCommand*>;
+    using command_map = QMap<QString,const User::Command*>;
 
     CommandParser() = default;
 
-    void addCommand(const User::UserCommand& pCommand);
-    void removeCommand(const User::UserCommand& pCommand);
+    void addCommand(const User::Command& pCommand);
+    void removeCommand(const User::Command& pCommand);
     void parseString(const QString& pCommand_str);
 
     const command_map& getCommands() const;

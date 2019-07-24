@@ -9,7 +9,6 @@ set(SOURCES
     interface.cpp
     commandparser.cpp
     command.cpp
-    usercommand.cpp
     userstdcommands.cpp
     )
 

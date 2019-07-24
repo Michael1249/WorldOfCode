@@ -1,12 +1,12 @@
 #include "qiostream.h"
 #include "commandparser.h"
 
-void UI::CommandParser::addCommand(const User::UserCommand &pCommand)
+void UI::CommandParser::addCommand(const User::Command &pCommand)
 {
     mCommands.insert(pCommand.getName(), &pCommand);
 }
 
-void UI::CommandParser::removeCommand(const User::UserCommand &pCommand)
+void UI::CommandParser::removeCommand(const User::Command &pCommand)
 {
     mCommands.remove(pCommand.getName());
 }

@@ -23,7 +23,7 @@ void UI::User::UserStdCommands::help_request(const QString &pStr)
 
           for (auto& arg: command->getArgumentsInfo())
           {
-              QIO::qout << QString(" <%1>").arg(arg.arg_name);
+              QIO::qout << QString(" <%1>").arg(arg.name);
           }
 
           QIO::qout << endl;
@@ -38,8 +38,8 @@ void UI::User::UserStdCommands::help_request(const QString &pStr)
           for (auto& arg: command->getArgumentsInfo())
           {
               QIO::qout << QString("<%1, %2> = \"%3\"")
-                           .arg(arg.arg_name)
-                           .arg(arg.arg_short_name)
+                           .arg(arg.name)
+                           .arg(arg.short_name)
                            .arg(arg.default_value)
                         << endl
                         << arg.help_tip
@@ -51,7 +51,7 @@ void UI::User::UserStdCommands::help_request(const QString &pStr)
       {
           for(auto command : command_map)
           {
-              QIO::qout << qSetFieldWidth(12)
+              QIO::qout << qSetFieldWidth(16)
                         << left
                         << command->getName();
               if(command->hasHelpTip())

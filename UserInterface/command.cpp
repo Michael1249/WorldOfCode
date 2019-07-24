@@ -1,20 +1,80 @@
 #include <QStringList>
 #include <QtDebug>
+#include "interface.h"
+#include "qiostream.h"
 #include "command.h"
 
 namespace UI
 {
+namespace User
+{
+
+Command::Command(Command &&temp):
+    mName(std::move(temp.mName)),
+    mHelp_tip(std::move(temp.mHelp_tip)),
+    mSignature(temp.mSignature),
+    mAdapter(std::move(temp.mAdapter)),
+    mFlag_track_enable_state(temp.mFlag_track_enable_state)
+{
+    Interface::getInstance()->addCommand(*this);
+}
+
+Command::Command(const QString pName, bool pTrack_enable_state):
+    mName(pName),
+    mFlag_track_enable_state(pTrack_enable_state)
+{
+    Interface::getInstance()->addCommand(*this);
+
+    if(mFlag_track_enable_state)
+    {
+        QIO::qout << '+' << getName() << endl;
+    }
+}
 
 Command::Command(std::unique_ptr<ICommandDelegate> pAdapter,
                  const QString& pName,
                  const QList<ArgInfo>& pSignature,
-                 const QString& pHelp_tip):
+                 const QString& pHelp_tip,
+                 bool pTrack_enable_state):
     mName(pName),
     mHelp_tip(pHelp_tip),
     mSignature(pSignature),
-    mAdapter(std::move(pAdapter))
+    mAdapter(std::move(pAdapter)),
+    mFlag_track_enable_state(pTrack_enable_state)
 {
+    Interface::getInstance()->addCommand(*this);
 
+    if(mFlag_track_enable_state)
+    {
+        QIO::qout << '+' << getName() << endl;
+    }
+}
+
+Command::~Command()
+{
+    Interface::getInstance()->removeCommand(*this);
+    if(mFlag_track_enable_state)
+    {
+        QIO::qout << '-' << getName() << endl;
+    }
+}
+
+Command &Command::setAdapter(std::unique_ptr<ICommandDelegate> pAdapter)
+{
+    mAdapter = std::move(pAdapter);
+    return *this;
+}
+
+Command &Command::addArg(const ArgInfo &pArg)
+{
+    mSignature.append(pArg);
+    return *this;
+}
+
+Command &Command::addHelpTip(const QString &pHelp_tip)
+{
+    mHelp_tip = pHelp_tip;
+    return *this;
 }
 
 void Command::exec(const QString &pArgs) const
@@ -50,7 +110,7 @@ const QString &Command::getHelpTip() const
     return mHelp_tip;
 }
 
-const QList<Command::ArgInfo> &Command::getArgumentsInfo() const
+const QList<ArgInfo> &Command::getArgumentsInfo() const
 {
     return mSignature;
 }
@@ -124,7 +184,7 @@ QVector<QString> Command::parse(const QStringList &args_list) const
             int arg_pos = -1;
             for (int j = 0; j < mSignature.size(); ++j)
             {
-                if(name == mSignature[j].arg_name || name == mSignature[j].arg_short_name)
+                if(name == mSignature[j].name || name == mSignature[j].short_name)
                 {
                     arg_pos = j;
                     break;
@@ -165,4 +225,5 @@ QVector<QString> Command::parse(const QStringList &args_list) const
     return vals_list;
 }
 
-} // UserInterface
+} // User
+} // UI

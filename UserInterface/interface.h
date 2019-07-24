@@ -14,14 +14,14 @@ public:
     void run();
     const CommandParser& getParser();
 private:
-    friend class UserCommand;
+    friend class Command;
 
     Interface() = default;
     Interface(const Interface&) = delete;
     Interface& operator=(Interface&) = delete;
 
-    void addCommand(const UserCommand& pCommand);
-    void removeCommand(const UserCommand& pCommand);
+    void addCommand(const Command& pCommand);
+    void removeCommand(const Command& pCommand);
 
     CommandParser mParser;
     bool mFlag_run_end = false;

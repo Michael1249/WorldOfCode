@@ -36,7 +36,7 @@ class MemFuncAdapter
     {
         static ret_val_t call(obj_t& obj, ret_val_t(obj_t::*mem_func_ptr)(mem_func_args_t...), args_container_t& args)
         {
-            // necessary C - style casting
+            // necessary C - style casting args[i] to argument type
             return (obj.*mem_func_ptr)(args[indxs]...);
         }
     };
@@ -102,10 +102,10 @@ public:
 };
 
 template<class obj_t, class ret_val_t, class ...mem_func_args_t>
-auto getCommandDelegate(obj_t& obj, ret_val_t(obj_t::*mem_func_ptr)(mem_func_args_t...))
+auto getCommandDelegate(obj_t* obj, ret_val_t(obj_t::*mem_func_ptr)(mem_func_args_t...))
 {
     return std::unique_ptr<CommandDelegate<obj_t, ret_val_t, mem_func_args_t...>>
-           (new CommandDelegate<obj_t, ret_val_t, mem_func_args_t...>(obj, mem_func_ptr));
+           (new CommandDelegate<obj_t, ret_val_t, mem_func_args_t...>(*obj, mem_func_ptr));
 }
 
 } // UserInterface

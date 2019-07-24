@@ -2,7 +2,7 @@
 #define USERINITCOMMAND_H
 
 #include <QString>
-#include "usercommand.h"
+#include "command.h"
 
 namespace UI
 {
@@ -14,28 +14,17 @@ class UserComponentManager
 {
 public:
     UserComponentManager(const QString& component_name, const QString& help_tip = ""):
-        mInit_commnd
-        {
-            getCommandDelegate(*this, &UserComponentManager::getInstance),
-            component_name + ".init",
-            {
-                {}
-            },
-            "Initial component - " + component_name + ". " + help_tip,
-            false
-        },
-        mExit_commnd
-        {
-            getCommandDelegate(*this, &UserComponentManager::deleteComponent),
-            component_name + ".exit",
-            {
-                {}
-            },
-            "Exit component - " + component_name + ". " + help_tip,
-            false
-        }
+        mInit_command(component_name + ".init", false),
+        mExit_command(component_name + ".exit", false)
     {
-        mExit_commnd.setEnable(false);
+        mInit_command
+                .setAdapter(getCommandDelegate(this, &UserComponentManager::getInstance))
+                .addHelpTip("initial component - " + component_name + ". " + help_tip);
+
+        mExit_command
+                .setAdapter(getCommandDelegate(this, &UserComponentManager::deleteComponent))
+                .addHelpTip("exit component - " + component_name + ". " + help_tip)
+                .setEnable(false);
     }
 
 private:
@@ -59,8 +48,8 @@ private:
 
     }
 
-    UserCommand mInit_commnd;
-    UserCommand mExit_commnd;
+    Command mInit_command;
+    Command mExit_command;
     static T* p_component;
 };
 

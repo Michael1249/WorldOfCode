@@ -8,12 +8,12 @@ namespace UI
 namespace User
 {
 
-void Interface::addCommand(const UserCommand &pCommand)
+void Interface::addCommand(const Command &pCommand)
 {
     mParser.addCommand(pCommand);
 }
 
-void Interface::removeCommand(const UserCommand &pCommand)
+void Interface::removeCommand(const Command &pCommand)
 {
     mParser.removeCommand(pCommand);
 }

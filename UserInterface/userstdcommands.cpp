@@ -6,44 +6,60 @@ void UI::User::UserStdCommands::help_request(const QString &pStr)
 {
       auto command_map = UI::User::Interface::getInstance()->getParser().getCommands();
 
-      command_map.erase(std::remove_if(command_map.begin(), command_map.end(),
-                     [pStr](auto command)
-                     {
-                        return !command->getName().contains(pStr, Qt::CaseInsensitive);
-                     }));
+      for(auto iter = command_map.begin(); iter != command_map.end();)
+      {
+          if(!iter.value()->getName().contains(pStr, Qt::CaseInsensitive))
+          {
+               iter = command_map.erase(iter);
+          }
+          else
+          {
+            ++iter;
+          }
+      }
 
       if (command_map.size() == 0)
       {
-          QIO::qout << "Nothing found" << endl;
+          qio::qout << "Nothing found" << endl;
       }
       else if(command_map.size() == 1)
       {
           auto command = command_map.begin().value();
-          QIO::qout << command->getName();
+          qio::qout << command->getName();
 
           for (auto& arg: command->getArgumentsInfo())
           {
-              QIO::qout << QString(" <%1>").arg(arg.name);
+              qio::qout << QString(" <%1>").arg(arg.name);
           }
 
-          QIO::qout << endl;
+          qio::qout << endl;
 
           if(command->hasHelpTip())
           {
-              QIO::qout << command->getHelpTip() << endl;
+              qio::qout << command->getHelpTip() << endl;
           }
 
-          QIO::qout << left;
-
-          for (auto& arg: command->getArgumentsInfo())
+          if(command->getArgumentsInfo().size())
           {
-              QIO::qout << QString("<%1, %2> = \"%3\"")
-                           .arg(arg.name)
-                           .arg(arg.short_name)
-                           .arg(arg.default_value)
-                        << endl
-                        << arg.help_tip
-                        << endl;
+              qio::qout << left;
+
+              for (auto& arg: command->getArgumentsInfo())
+              {
+                  qio::qout << QString(40, '_')
+                            << endl
+                            << QString("<%1, %2> = \"%3\"")
+                               .arg(arg.name)
+                               .arg(arg.short_name)
+                               .arg(arg.default_value)
+                            << endl
+                            << arg.help_tip
+                            << endl;
+              }
+
+          }
+          else
+          {
+              qio::qout << "Without arguments." << endl;
           }
 
       }
@@ -51,18 +67,18 @@ void UI::User::UserStdCommands::help_request(const QString &pStr)
       {
           for(auto command : command_map)
           {
-              QIO::qout << qSetFieldWidth(16)
+              qio::qout << qSetFieldWidth(16)
                         << left
                         << command->getName();
               if(command->hasHelpTip())
               {
-                  QIO::qout << qSetFieldWidth(0)
+                  qio::qout << qSetFieldWidth(0)
                             << " : "
                             << command->getHelpTip();
               }
-              QIO::qout << endl;
+              qio::qout << endl;
           }
       }
 
-    QIO::qout.flush();
+    qio::qout.flush();
 }

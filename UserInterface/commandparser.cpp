@@ -28,8 +28,8 @@ void UI::CommandParser::parseString(const QString& pCommand_str)
         }
         else
         {
-            QIO::qout << "[ERROR]: Unknown command!\n";
-            QIO::qout.flush();
+            qio::qout << "[ERROR]: Unknown command!\n";
+            qio::qout.flush();
         }
 
     }

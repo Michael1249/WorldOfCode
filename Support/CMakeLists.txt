@@ -10,6 +10,7 @@ set(SOURCES
     qiostream.cpp
     table.cpp
     tebleraw.cpp
+    qexceptionmessage.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

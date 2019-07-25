@@ -26,7 +26,7 @@ Interface *Interface::getInstance()
 
 void Interface::run()
 {
-    using namespace QIO;
+    using namespace qio;
     while (!mFlag_run_end)
     {
         qout << ">>>";

@@ -12,9 +12,10 @@ namespace User
 Command::Command(Command &&temp):
     mName(std::move(temp.mName)),
     mHelp_tip(std::move(temp.mHelp_tip)),
-    mSignature(temp.mSignature),
+    mArguments(temp.mArguments),
     mAdapter(std::move(temp.mAdapter)),
-    mFlag_track_enable_state(temp.mFlag_track_enable_state)
+    mFlag_track_enable_state(temp.mFlag_track_enable_state),
+    mDisable_reason(std::move(temp.mDisable_reason))
 {
     Interface::getInstance()->addCommand(*this);
 }
@@ -27,18 +28,18 @@ Command::Command(const QString pName, bool pTrack_enable_state):
 
     if(mFlag_track_enable_state)
     {
-        QIO::qout << '+' << getName() << endl;
+        qio::qout << '+' << getName() << endl;
     }
 }
 
 Command::Command(std::unique_ptr<ICommandDelegate> pAdapter,
                  const QString& pName,
-                 const QList<ArgInfo>& pSignature,
+                 const QList<ArgInfo>& pArguments,
                  const QString& pHelp_tip,
                  bool pTrack_enable_state):
     mName(pName),
     mHelp_tip(pHelp_tip),
-    mSignature(pSignature),
+    mArguments(pArguments),
     mAdapter(std::move(pAdapter)),
     mFlag_track_enable_state(pTrack_enable_state)
 {
@@ -46,7 +47,7 @@ Command::Command(std::unique_ptr<ICommandDelegate> pAdapter,
 
     if(mFlag_track_enable_state)
     {
-        QIO::qout << '+' << getName() << endl;
+        qio::qout << '+' << getName() << endl;
     }
 }
 
@@ -55,7 +56,7 @@ Command::~Command()
     Interface::getInstance()->removeCommand(*this);
     if(mFlag_track_enable_state)
     {
-        QIO::qout << '-' << getName() << endl;
+        qio::qout << '-' << getName() << endl;
     }
 }
 
@@ -67,7 +68,7 @@ Command &Command::setAdapter(std::unique_ptr<ICommandDelegate> pAdapter)
 
 Command &Command::addArg(const ArgInfo &pArg)
 {
-    mSignature.append(pArg);
+    mArguments.append(pArg);
     return *this;
 }
 
@@ -77,22 +78,58 @@ Command &Command::addHelpTip(const QString &pHelp_tip)
     return *this;
 }
 
+Command &Command::addDisableReason(const QString &pReason)
+{
+    mDisable_reason = pReason;
+    return *this;
+}
+
 void Command::exec(const QString &pArgs) const
 {
 
     if(mIs_enable)
     {
         QStringList arg_list = splitArgsLine(pArgs);
-        QVector<QString> val_list = parse(arg_list);
 
-        mAdapter.get()->Invoke(val_list);
+        try
+        {
+            QVector<QString> val_list = parseArgLine(arg_list);
+            mAdapter.get()->Invoke(val_list);
+        }
+        catch (QExceptionMessage& e)
+        {
+            qio::qout << "[ERROR]: " << e.getMessage() << endl;
+        }
+        catch (std::exception& e)
+        {
+            qio::qout << "[ERROR]: " << e.what() << endl;
+        }
+
+    }
+    else
+    {
+        qio::qout << mDisable_reason << endl;
     }
 
 }
 
-void Command::setEnable(bool pEnable)
+void Command::enable()
 {
-    mIs_enable = pEnable;
+    mIs_enable = true;
+}
+
+void Command::disable(const QString &pReason)
+{
+    if(pReason.size())
+    {
+        mDisable_reason = pReason;
+    }
+    else
+    {
+        mDisable_reason = "command disabled";
+    }
+
+    mIs_enable = false;
 }
 
 bool Command::isEnable() const
@@ -112,7 +149,7 @@ const QString &Command::getHelpTip() const
 
 const QList<ArgInfo> &Command::getArgumentsInfo() const
 {
-    return mSignature;
+    return mArguments;
 }
 
 bool Command::hasHelpTip() const
@@ -163,13 +200,13 @@ QString removeBrackets(const QString& pStr)
     return result;
 }
 
-QVector<QString> Command::parse(const QStringList &args_list) const
+QVector<QString> Command::parseArgLine(const QStringList &args_list) const
 {
-    QVector<QString> vals_list;
-    QVector<bool> setted_vals;
-    vals_list.resize(mSignature.size());
-    setted_vals.resize(mSignature.size());
-    bool ban_positional = false;
+    QVector<QString> values;
+    QVector<bool> setted_values;
+    values.resize(mArguments.size());
+    setted_values.resize(mArguments.size());
+    bool flag_ban_positional = false;
 
     for (int i = 0; i < args_list.size(); ++i)
     {
@@ -177,14 +214,14 @@ QVector<QString> Command::parse(const QStringList &args_list) const
 
         if(current_arg.startsWith('-'))
         {
-            ban_positional = true;
+            flag_ban_positional = true;
             QString name = current_arg.section('=', 0, 0).remove('-');
             QString val = current_arg.section('=', 1);
 
             int arg_pos = -1;
-            for (int j = 0; j < mSignature.size(); ++j)
+            for (int j = 0; j < mArguments.size(); ++j)
             {
-                if(name == mSignature[j].name || name == mSignature[j].short_name)
+                if(name == mArguments[j].name || name == mArguments[j].short_name)
                 {
                     arg_pos = j;
                     break;
@@ -192,37 +229,37 @@ QVector<QString> Command::parse(const QStringList &args_list) const
             }
             if(arg_pos != -1)
             {
-                vals_list[arg_pos] = val.size() ? removeBrackets(val) : mSignature[arg_pos].default_value;
-                setted_vals[arg_pos] = true;
+                values[arg_pos] = val.size() ? removeBrackets(val) : mArguments[arg_pos].default_value;
+                setted_values[arg_pos] = true;
             }
             else
             {
-                //critical unknown arg name
-                qDebug("unknown arg name");
+                throw QExceptionMessage("Unknown argument name <" + name + '>' );
             }
 
         }
         else
         {
-            if(!ban_positional)
+            if(!flag_ban_positional)
             {
-                vals_list[i] = current_arg.size() ? removeBrackets(current_arg) : mSignature[i].default_value;
-                setted_vals[i] = true;
+                values[i] = current_arg.size() ? removeBrackets(current_arg) : mArguments[i].default_value;
+                setted_values[i] = true;
             }
             else
             {
-                qDebug("undefined arg position");//error undefined arg position
+                throw QExceptionMessage("Positional argument \"" + current_arg
+                                        + "\" must be placed before nemed argument(s)" );
             }
         }
     }
 
-    for (int i = 0; i < setted_vals.size(); ++i)
+    for (int i = 0; i < setted_values.size(); ++i)
     {
-        if(!setted_vals[i])
-            vals_list[i] = mSignature[i].default_value;
+        if(!setted_values[i])
+            values[i] = mArguments[i].default_value;
     }
 
-    return vals_list;
+    return values;
 }
 
 } // User

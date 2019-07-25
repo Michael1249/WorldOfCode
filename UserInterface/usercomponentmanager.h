@@ -18,23 +18,31 @@ public:
         mExit_command(component_name + ".exit", false)
     {
         mInit_command
-                .setAdapter(getCommandDelegate(this, &UserComponentManager::getInstance))
-                .addHelpTip("initial component - " + component_name + ". " + help_tip);
+                .setAdapter(getCommandDelegate(this, &UserComponentManager::initComponent))
+                .addHelpTip("init component - " + component_name + ". " + help_tip);
 
         mExit_command
                 .setAdapter(getCommandDelegate(this, &UserComponentManager::deleteComponent))
                 .addHelpTip("exit component - " + component_name + ". " + help_tip)
-                .setEnable(false);
+                .disable();
+    }
+
+    static T* getComponent()
+    {
+        return p_component;
     }
 
 private:
 
-    T* getInstance()
+    T* initComponent()
     {
         if(!p_component)
         {
             p_component = new T();
         }
+
+        mInit_command.disable("Component already init");
+        mExit_command.enable();
 
         return p_component;
     }
@@ -44,7 +52,11 @@ private:
         if(p_component)
         {
             delete p_component;
+            p_component = nullptr;
         }
+
+        mInit_command.enable();
+        mExit_command.disable("Component already exit");
 
     }
 

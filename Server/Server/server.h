@@ -1,32 +1,32 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <QObject>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
-#include <QDataStream>
-#include <QTime>
+#include <QMap>
 
 namespace serverSpace
 {
 
-
-class Server : QTcpServer
+class Server: public QTcpServer
 {
-Q_OBJECT
+    Q_OBJECT
 private:
+    QMap<qint64, QTcpSocket*> mClientSockets;
     QTcpServer* mptrServer;
-    quint16 mNextBlockSize;
+    void shutdown();
 
-    void sendToClient(QTcpSocket* pSocket, const QString& str);
-public:
-    Server(int pPort);
-
-public slots:
-    virtual void slotNewConnection();
+private slots:
     void slotReadClient();
-};
+    void slotNewConnection();
+    void slotClientDisconnect();
 
+public:
+    void start();
+    ~Server();
+};
 
 }
 
-#endif // SERVER_H
+#endif

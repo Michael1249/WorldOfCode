@@ -5,6 +5,8 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    serverSpace::Server c(2323);
+    serverSpace::Server c;
+    c.start();
+
     return a.exec();
 }

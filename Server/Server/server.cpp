@@ -7,7 +7,7 @@ Server::Server(int pPort) : mNextBlockSize(0)
 {
     mptrServer = new QTcpServer(this);
      if (!mptrServer->listen(QHostAddress::Any, pPort)) {
-         QIO::qout << "Unable to start the server:" + mptrServer->errorString() << endl;
+         qio::qout << "Unable to start the server:" + mptrServer->errorString() << endl;
          mptrServer->close();
          return;
      }
@@ -46,7 +46,7 @@ void Server::slotReadClient()
 
         QString strMessage =
             time.toString() + " " + "Client has sended - " + str;
-        QIO::qout << strMessage << endl;
+        qio::qout << strMessage << endl;
 
         mNextBlockSize = 0;
 

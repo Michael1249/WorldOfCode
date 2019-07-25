@@ -15,7 +15,7 @@ Client::Client(const QString pHost, quint16 pPort)
 
     if(!mptrSocket->isOpen())
     {
-        QIO::qout << "Connection is close." << endl;
+        qio::qout << "Connection is close." << endl;
     }
 }
 
@@ -41,7 +41,7 @@ void Client::slotReadyRead()
         QString str;
         in >> time >> str;
 
-        QIO::qout << "Data read succesfully." << endl;
+        qio::qout << "Data read succesfully." << endl;
         mNextBlockSize = 0;
     }
 }
@@ -57,7 +57,7 @@ void Client::slotError(QAbstractSocket::SocketError err)
                      "The connection was refused." :
                      QString(mptrSocket->errorString())
                     );
-    QIO::qout << strError << endl;
+    qio::qout << strError << endl;
 }
 
 void Client::slotSendToServer() {
@@ -73,5 +73,5 @@ void Client::slotSendToServer() {
 }
 
 void Client::slotConnected() {
-    QIO::qout << "Connection is open." << endl;
+    qio::qout << "Connection is open." << endl;
 }

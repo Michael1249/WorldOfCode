@@ -5,7 +5,7 @@
 #include <QTextStream>
 #include "tebleraw.h"
 
-namespace QIO
+namespace qio
 {
 
 class Table : public QVector<TebleRaw>

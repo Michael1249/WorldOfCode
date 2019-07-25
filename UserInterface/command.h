@@ -1,11 +1,12 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <memory.h>
 #include <QString>
 #include <QStringList>
 #include <QVector>
-#include <memory.h>
 #include "commandadapter.h"
+#include "qexceptionmessage.h"
 
 namespace UI
 {
@@ -29,13 +30,14 @@ public:
     Command(const QString pName, bool pTrack_enable_state = true);
     Command(std::unique_ptr<ICommandDelegate> pAdapter,
             const QString& pName,
-            const QList<ArgInfo>& pSignature,
+            const QList<ArgInfo>& pArguments,
             const QString& pHelp_tip,
             bool pTrack_enable_state = true);
     ~Command();
 
     Command& addArg(const ArgInfo& pArg);
     Command& addHelpTip(const QString& pHelp_tip);
+    Command& addDisableReason(const QString& pReason);
 
     Command& setAdapter(std::unique_ptr<ICommandDelegate> pAdapter);
     template<class Obj_t, class Mfunc_t>
@@ -47,7 +49,8 @@ public:
 
     void exec(const QString& pArgs) const;
 
-    void setEnable(bool pEnable);
+    void enable();
+    void disable(const QString& pReason = "");
     bool isEnable() const;
 
     const QString& getName() const;
@@ -56,16 +59,18 @@ public:
     bool hasHelpTip() const;
 
 private:
+
     static QStringList splitArgsLine(const QString & pArgs_str);
-    QVector<QString> parse(const QStringList& args_list) const;
+    QVector<QString> parseArgLine(const QStringList& args_list) const;
 
     QString mName;
     QString mHelp_tip;
-    QList<ArgInfo> mSignature;
+    QList<ArgInfo> mArguments;
     std::unique_ptr<ICommandDelegate> mAdapter;
 
     bool mIs_enable = true;
     bool mFlag_track_enable_state;
+    QString mDisable_reason = "";
 };
 
 } //User

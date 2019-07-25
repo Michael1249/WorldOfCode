@@ -7,7 +7,7 @@ class TestComponent
 {
     void foo(const QString& pStr)
     {
-        QIO::qout << __FUNCTION__ << " : " << pStr << endl;
+        qio::qout << __FUNCTION__ << " : " << pStr << endl;
     }
 
     UI::User::Command cmd_foo =

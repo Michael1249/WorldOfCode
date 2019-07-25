@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "table.h"
 
-namespace QIO
+namespace qio
 {
 
 Table::Table(const QString& pDelimeter, int pSize):

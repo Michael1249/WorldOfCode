@@ -3,7 +3,7 @@
 
 #include<QTextStream>
 
-namespace QIO
+namespace qio
 {
 
 extern QTextStream qout;

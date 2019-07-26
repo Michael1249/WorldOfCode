@@ -1,11 +1,18 @@
 #include <QCoreApplication>
-#include "UserInterface/interface.h"
-#include "UserInterface/userstdcommands.h"
+#include <Client/client.h>
+#include <qiostream.h>
+#include <QFile>
+
+// Send data in little packages
+// Must open file in any mode
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    UI::API::Run();
+    using namespace QIO;
+
+    clientSpace::Client c("localhost");
 
     return a.exec();
 }

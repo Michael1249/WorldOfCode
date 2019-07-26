@@ -1,3 +1,4 @@
+#include <QDataStream>
 #include "server.h"
 #include "qiostream.h"
 
@@ -9,14 +10,12 @@ void Server::start()
 
     connect(mptrServer, &QTcpServer::newConnection, this, &Server::slotNewConnection);
 
-    if(!mptrServer->listen(QHostAddress::Any, 9999)){
+    if(!mptrServer->listen(QHostAddress::Any, 9999))
         QIO::qout << "Server is not started. " << mptrServer->errorString() << endl;
-
-        QIO::qout.flush();
-    } else {
+    else
         QIO::qout << "Server is started" << endl;
-        QIO::qout.flush();
-    }
+
+    QIO::qout.flush();
 }
 
 void Server::slotNewConnection()
@@ -31,22 +30,77 @@ void Server::slotNewConnection()
 
     connect(mClientSockets[socketID], SIGNAL(readyRead()), this, SLOT(slotReadClient()));
     connect(mClientSockets[socketID], SIGNAL(disconnected()), this, SLOT(slotClientDisconnect()));
+
+    if(socketID == 8) sendToAllClients("Hello");
 }
 
 void Server::slotReadClient()
 {
     QTcpSocket* clientSocket = static_cast<QTcpSocket*>(sender());
 
-    QIO::qout << "Client sended - " << clientSocket->readAll() << endl;
-    QIO::qout.flush();
+    QDataStream in(clientSocket);
+
+    for(;;)
+    {
+        if(!mi16_nextBlockSize)
+        {
+            if(clientSocket->bytesAvailable() < sizeof (quint16)) break;
+
+            in >> mi16_nextBlockSize;
+        }
+
+        if(clientSocket->bytesAvailable() < mi16_nextBlockSize) break;
+
+        QString str;
+
+        in >> str;
+
+        mi16_nextBlockSize = 0;
+
+        QIO::qout << "Client send: " << str << endl;
+        QIO::qout.flush();
+    }
+
+    clientSocket->flush();
 }
 
 void Server::slotClientDisconnect()
 {
+    using namespace QIO;
     QTcpSocket* clientSocket = static_cast<QTcpSocket*>(sender());
 
-    clientSocket->close();
+    qout << mClientSockets.size() << endl;
+    qout.flush();
+
     mClientSockets.remove(clientSocket->socketDescriptor());
+    clientSocket->deleteLater();
+
+    qout << mClientSockets.size() << endl;
+    qout.flush();
+}
+
+
+
+void Server::sendToClient(const qint64 pll_clientSocketID, const QString pMessage)
+{
+    QTcpSocket* clientSocket = new QTcpSocket;
+    clientSocket->setSocketDescriptor(pll_clientSocketID);
+
+    QByteArray arrBlock;
+    QDataStream out(&arrBlock, QIODevice::WriteOnly);
+
+    out << quint16(0) << pMessage;
+
+    out.device()->seek(0);
+    out << quint16(arrBlock.size() - sizeof(quint16));
+
+    clientSocket->write(arrBlock);
+}
+
+void Server::sendToAllClients(const QString pMessage)
+{
+    for(auto& sockeyID: mClientSockets.keys())
+        sendToClient(sockeyID, pMessage);
 }
 
 void Server::shutdown()
@@ -58,11 +112,4 @@ void Server::shutdown()
     }
 
     mptrServer->close();
-}
-
-Server::~Server()
-{
-    shutdown();
-
-    delete mptrServer;
 }

@@ -1,24 +1,25 @@
-#ifndef STDCOMMANDS_H
-#define STDCOMMANDS_H
+#ifndef USERSTDCOMMANDS_H
+#define USERSTDCOMMANDS_H
 
 #include "QString"
-#include "Command.h"
+#include "interface.h"
+#include "commandadapter.h"
+#include "command.h"
 
 namespace UI
 {
+namespace User
+{
 
-class StdCommands
+class UserStdCommands
 {
 public:
-
-    StdCommands() = default;
-
-private:
+    UserStdCommands() = default;
 
     void help_request(const QString& pStr);
     Command cmd_help_request = std::move(
             Command("help", false)
-            .linkTo( this, &StdCommands::help_request)
+            .setAdapter( this, &UserStdCommands::help_request)
             .addArg(
                 ArgInfo
                 {
@@ -33,6 +34,7 @@ private:
 
 };
 
+} // API
 } // UI
 
-#endif // STDCOMMANDS_H
+#endif // USERSTDCOMMANDS_H

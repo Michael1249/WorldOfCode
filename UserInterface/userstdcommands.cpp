@@ -1,10 +1,10 @@
-#include "Interface.h"
+#include "interface.h"
 #include "qiostream.h"
-#include "StdCommands.h"
+#include "userstdcommands.h"
 
-void UI::StdCommands::help_request(const QString &pStr)
+void UI::User::UserStdCommands::help_request(const QString &pStr)
 {
-      auto command_map = UI::Interface::getInstance().getParser().getCommands();
+      auto command_map = UI::User::Interface::getInstance()->getParser().getCommands();
 
       for(auto iter = command_map.begin(); iter != command_map.end();)
       {

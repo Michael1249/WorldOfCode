@@ -1,0 +1,4 @@
+#ifndef UICONSTANTS_H
+#define UICONSTANTS_H
+
+#endif // UICONSTANTS_H

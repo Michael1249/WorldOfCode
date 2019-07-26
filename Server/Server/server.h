@@ -15,7 +15,7 @@ class Server: public QTcpServer
 private:
     QMap<qint64, QTcpSocket*> mClientSockets;
     QTcpServer* mptrServer;
-    void shutdown();
+    quint16 mi16_nextBlockSize = 0;
 
 private slots:
     void slotReadClient();
@@ -23,8 +23,11 @@ private slots:
     void slotClientDisconnect();
 
 public:
+    void sendToClient(const qint64 pll_clientSocketID, const QString pMessage);
+    void sendToAllClients(const QString pMessage);
     void start();
-    ~Server();
+    void shutdown();
+    ~Server() {delete mptrServer;}
 };
 
 }

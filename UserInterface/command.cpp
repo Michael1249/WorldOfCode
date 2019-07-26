@@ -1,12 +1,10 @@
 #include <QStringList>
 #include <QtDebug>
-#include "interface.h"
+#include "Interface.h"
 #include "qiostream.h"
-#include "command.h"
+#include "Command.h"
 
 namespace UI
-{
-namespace User
 {
 
 Command::Command(Command &&temp):
@@ -14,19 +12,19 @@ Command::Command(Command &&temp):
     mHelp_tip(std::move(temp.mHelp_tip)),
     mArguments(temp.mArguments),
     mAdapter(std::move(temp.mAdapter)),
-    mFlag_track_enable_state(temp.mFlag_track_enable_state),
-    mDisable_reason(std::move(temp.mDisable_reason))
+    mDisable_reason(std::move(temp.mDisable_reason)),
+    mFlag_track(temp.mFlag_track)
 {
-    Interface::getInstance()->addCommand(*this);
+    Interface::getInstance().addCommand(*this);
 }
 
-Command::Command(const QString pName, bool pTrack_enable_state):
+Command::Command(const QString pName, bool pTrack):
     mName(pName),
-    mFlag_track_enable_state(pTrack_enable_state)
+    mFlag_track(pTrack)
 {
-    Interface::getInstance()->addCommand(*this);
+    Interface::getInstance().addCommand(*this);
 
-    if(mFlag_track_enable_state)
+    if(mFlag_track)
     {
         qio::qout << '+' << getName() << endl;
     }
@@ -36,16 +34,16 @@ Command::Command(std::unique_ptr<ICommandDelegate> pAdapter,
                  const QString& pName,
                  const QList<ArgInfo>& pArguments,
                  const QString& pHelp_tip,
-                 bool pTrack_enable_state):
+                 bool pTrack):
     mName(pName),
     mHelp_tip(pHelp_tip),
     mArguments(pArguments),
     mAdapter(std::move(pAdapter)),
-    mFlag_track_enable_state(pTrack_enable_state)
+    mFlag_track(pTrack)
 {
-    Interface::getInstance()->addCommand(*this);
+    Interface::getInstance().addCommand(*this);
 
-    if(mFlag_track_enable_state)
+    if(mFlag_track)
     {
         qio::qout << '+' << getName() << endl;
     }
@@ -53,38 +51,38 @@ Command::Command(std::unique_ptr<ICommandDelegate> pAdapter,
 
 Command::~Command()
 {
-    Interface::getInstance()->removeCommand(*this);
-    if(mFlag_track_enable_state)
+    Interface::getInstance().removeCommand(*this);
+    if(mFlag_track && mAdapter)
     {
         qio::qout << '-' << getName() << endl;
     }
 }
 
-Command &Command::setAdapter(std::unique_ptr<ICommandDelegate> pAdapter)
+Command& Command::linkTo(std::unique_ptr<ICommandDelegate> pAdapter)
 {
     mAdapter = std::move(pAdapter);
     return *this;
 }
 
-Command &Command::addArg(const ArgInfo &pArg)
+Command& Command::addArg(const ArgInfo& pArg)
 {
     mArguments.append(pArg);
     return *this;
 }
 
-Command &Command::addHelpTip(const QString &pHelp_tip)
+Command& Command::addHelpTip(const QString& pHelp_tip)
 {
     mHelp_tip = pHelp_tip;
     return *this;
 }
 
-Command &Command::addDisableReason(const QString &pReason)
+Command& Command::addDisableReason(const QString& pReason)
 {
     mDisable_reason = pReason;
     return *this;
 }
 
-void Command::exec(const QString &pArgs) const
+void Command::exec(const QString& pArgs) const
 {
 
     if(mIs_enable)
@@ -118,7 +116,7 @@ void Command::enable()
     mIs_enable = true;
 }
 
-void Command::disable(const QString &pReason)
+void Command::disable(const QString& pReason)
 {
     if(pReason.size())
     {
@@ -142,12 +140,12 @@ const QString& Command::getName() const
     return mName;
 }
 
-const QString &Command::getHelpTip() const
+const QString& Command::getHelpTip() const
 {
     return mHelp_tip;
 }
 
-const QList<ArgInfo> &Command::getArgumentsInfo() const
+const QList<ArgInfo>& Command::getArgumentsInfo() const
 {
     return mArguments;
 }
@@ -157,7 +155,8 @@ bool Command::hasHelpTip() const
     return mHelp_tip.size();
 }
 
-QStringList Command::splitArgsLine(const QString &pArgs_str)
+// NOT MY CODE
+QStringList Command::splitArgsLine(const QString& pArgs_str)
 {
     QStringList list;
     QString arg;
@@ -189,6 +188,7 @@ QStringList Command::splitArgsLine(const QString &pArgs_str)
 QString removeBrackets(const QString& pStr)
 {
     QString result;
+
     if(pStr.startsWith('"') && pStr.endsWith('"'))
     {
         result = pStr.mid(1, pStr.size() - 2);
@@ -197,6 +197,7 @@ QString removeBrackets(const QString& pStr)
     {
         result = pStr;
     }
+
     return result;
 }
 
@@ -221,11 +222,13 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
             int arg_pos = -1;
             for (int j = 0; j < mArguments.size(); ++j)
             {
+
                 if(name == mArguments[j].name || name == mArguments[j].short_name)
                 {
                     arg_pos = j;
                     break;
                 }
+
             }
             if(arg_pos != -1)
             {
@@ -250,17 +253,21 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
                 throw QExceptionMessage("Positional argument \"" + current_arg
                                         + "\" must be placed before nemed argument(s)" );
             }
+
         }
+
     }
 
     for (int i = 0; i < setted_values.size(); ++i)
     {
-        if(!setted_values[i])
-            values[i] = mArguments[i].default_value;
-    }
 
+        if(!setted_values[i])
+        {
+            values[i] = mArguments[i].default_value;
+        }
+
+    }
     return values;
 }
 
-} // User
 } // UI

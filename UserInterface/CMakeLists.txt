@@ -6,10 +6,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
-    interface.cpp
-    commandparser.cpp
-    command.cpp
-    userstdcommands.cpp
+    Interface.cpp
+    CommandParser.cpp
+    Command.cpp
+    StdCommands.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

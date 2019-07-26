@@ -1,8 +1,6 @@
-#ifndef COMMANDADAPTER_H
-#define COMMANDADAPTER_H
+#ifndef FUNCTIONADAPTER_H
+#define FUNCTIONADAPTER_H
 
-#include <QStringList>
-#include <memory>
 namespace UI
 {
 
@@ -46,7 +44,7 @@ public:
 };
 
 
-//delegate based on CommandAdapter
+//delegate based on MemFuncAdapter
 template<class obj_t, class ret_val_t, class ...mem_func_args_t>
 class MemFuncAdapterDelegate
 {
@@ -76,38 +74,6 @@ auto getMemFuncAdapterDelegate(obj_t& obj, ret_val_t(obj_t::*mem_func_ptr)(mem_f
     return MemFuncAdapterDelegate<obj_t, ret_val_t, mem_func_args_t...>(obj, mem_func_ptr);
 }
 
-class ICommandDelegate
-{
-public:
-    virtual void Invoke(const QVector<QString>&) = 0;
-    virtual ~ICommandDelegate() = default;
-};
+} // UI
 
-template<class obj_t, class ret_val_t, class ...mem_func_args_t>
-class CommandDelegate: public MemFuncAdapterDelegate<obj_t, ret_val_t, mem_func_args_t...>,
-                       public ICommandDelegate
-{
-public:
-    CommandDelegate(obj_t& obj, ret_val_t(obj_t::*mem_func_ptr)(mem_func_args_t...)):
-        MemFuncAdapterDelegate<obj_t, ret_val_t, mem_func_args_t...>(obj, mem_func_ptr)
-    {
-
-    }
-
-    void Invoke(const QVector<QString>& args) override
-    {
-        MemFuncAdapterDelegate<obj_t, ret_val_t, mem_func_args_t...>::Invoke(args);
-    }
-
-};
-
-template<class obj_t, class ret_val_t, class ...mem_func_args_t>
-auto getCommandDelegate(obj_t* obj, ret_val_t(obj_t::*mem_func_ptr)(mem_func_args_t...))
-{
-    return std::unique_ptr<CommandDelegate<obj_t, ret_val_t, mem_func_args_t...>>
-           (new CommandDelegate<obj_t, ret_val_t, mem_func_args_t...>(*obj, mem_func_ptr));
-}
-
-} // UserInterface
-
-#endif // COMMANDADAPTER_H
+#endif // FUNCTIONADAPTER_H

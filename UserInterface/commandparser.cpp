@@ -1,21 +1,20 @@
 #include "qiostream.h"
-#include "commandparser.h"
+#include "CommandParser.h"
 
-void UI::CommandParser::addCommand(const User::Command &pCommand)
+void UI::CommandParser::addCommand(const Command &pCommand)
 {
     mCommands.insert(pCommand.getName(), &pCommand);
 }
 
-void UI::CommandParser::removeCommand(const User::Command &pCommand)
+void UI::CommandParser::removeCommand(const Command &pCommand)
 {
     mCommands.remove(pCommand.getName());
 }
 
 void UI::CommandParser::parseString(const QString& pCommand_str)
 {
-    //should be owerwrite with stringview, unnececary init new stings
+    //TODO: owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);
-
     QString command_args = pCommand_str.section(" ", 1);
 
     if (command_name != "")
@@ -28,7 +27,7 @@ void UI::CommandParser::parseString(const QString& pCommand_str)
         }
         else
         {
-            qio::qout << "[ERROR]: Unknown command!\n";
+            qio::qout << "[ERROR]: Unknown command!" << endl;
             qio::qout.flush();
         }
 

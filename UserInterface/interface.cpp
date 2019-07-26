@@ -1,16 +1,12 @@
 #include <QTextStream>
 #include "qiostream.h"
-#include "StdCommands.h"
-#include "Interface.h"
+#include "userstdcommands.h"
+#include "interface.h"
 
 namespace UI
 {
-
-void Run()
+namespace User
 {
-    static StdCommands std_commands;
-    Interface::getInstance().run();
-}
 
 void Interface::addCommand(const Command &pCommand)
 {
@@ -22,10 +18,10 @@ void Interface::removeCommand(const Command &pCommand)
     mParser.removeCommand(pCommand);
 }
 
-Interface& Interface::getInstance()
+Interface *Interface::getInstance()
 {
     static Interface* p_instance = new Interface();
-    return *p_instance;
+    return p_instance;
 }
 
 void Interface::run()
@@ -48,4 +44,11 @@ const CommandParser &Interface::getParser()
     return mParser;
 }
 
+void Run()
+{
+    static UserStdCommands std_commands;
+    Interface::getInstance()->run();
+}
+
+} // API
 } // UI

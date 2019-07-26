@@ -1,55 +1,51 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include <memory>
+#include <memory.h>
+#include <QString>
 #include <QStringList>
 #include <QVector>
-#include "CommandDelegate.h"
+#include "commandadapter.h"
 #include "qexceptionmessage.h"
 
 namespace UI
+{
+namespace User
 {
 
 struct ArgInfo
 {
     QString name;
     QChar short_name;
-
     QString help_tip = "";
     QString default_value = "";
+
 };
 
-/*
-Represetn interface between User (Input) and c++ function
-
-Provide to call function with user's input string line
-
-Note: each argument of function must to be able to initializate by QString object
-*/
 class Command
 {
 public:
 
-    Q_DISABLE_COPY(Command)
     Command(Command&& temp);
-    Command(const QString pName, bool pTrack = true);
+    Command(const QString pName, bool pTrack_enable_state = true);
     Command(std::unique_ptr<ICommandDelegate> pAdapter,
             const QString& pName,
             const QList<ArgInfo>& pArguments,
             const QString& pHelp_tip,
-            bool pTrack = true);
+            bool pTrack_enable_state = true);
     ~Command();
 
-    /*
-    methods for easy Command initialization
-    with explicit indication of the arguments passed
-    */
     Command& addArg(const ArgInfo& pArg);
     Command& addHelpTip(const QString& pHelp_tip);
     Command& addDisableReason(const QString& pReason);
-    Command& linkTo(std::unique_ptr<ICommandDelegate> pAdapter);
+
+    Command& setAdapter(std::unique_ptr<ICommandDelegate> pAdapter);
     template<class Obj_t, class Mfunc_t>
-    Command& linkTo(Obj_t* pObj, Mfunc_t pMfunc);
+    Command& setAdapter(Obj_t* pObj, Mfunc_t pMfunc)
+    {
+        mAdapter = std::move(getCommandDelegate(pObj, pMfunc));
+        return *this;
+    }
 
     void exec(const QString& pArgs) const;
 
@@ -73,19 +69,11 @@ private:
     std::unique_ptr<ICommandDelegate> mAdapter;
 
     bool mIs_enable = true;
+    bool mFlag_track_enable_state;
     QString mDisable_reason = "";
-
-    //if true, track creation and destruction and output to console
-    bool mFlag_track;
 };
 
-template<class Obj_t, class Mfunc_t>
-Command &Command::linkTo(Obj_t *pObj, Mfunc_t pMfunc)
-{
-    mAdapter = std::move(getCommandDelegate(pObj, pMfunc));
-    return *this;
-}
-
+} //User
 } //UI
 
 #endif // COMMAND_H

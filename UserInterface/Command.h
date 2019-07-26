@@ -73,7 +73,7 @@ private:
     std::unique_ptr<ICommandDelegate> mAdapter;
 
     bool mIs_enable = true;
-    QString mDisable_reason = "";
+    QString mDisable_reason;
 
     //if true, track creation and destruction and output to console
     bool mFlag_track;

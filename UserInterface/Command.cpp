@@ -245,6 +245,12 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
         {
             if(!flag_ban_positional)
             {
+
+                if(i >= values.size())
+                {
+                    throw QExceptionMessage(QString("Too many positional arguments. Not more than %1 expected.").arg(values.size()));
+                }
+
                 values[i] = current_arg.size() ? removeBrackets(current_arg) : mArguments[i].default_value;
                 setted_values[i] = true;
             }

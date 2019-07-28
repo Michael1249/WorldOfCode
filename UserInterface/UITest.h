@@ -3,10 +3,10 @@
 
 #include "UIComponent.h"
 
-class UIC_Test
+class UITest
 {
 public:
-    UIC_Test();
+    UITest();
 
 private:
     void foo(const QString& str);

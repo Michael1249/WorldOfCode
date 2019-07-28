@@ -3,12 +3,12 @@
 
 #include "UserInterface/Interface.h"
 #include "UserInterface/UITest.h"
-#include "Server/UIC_Server/UIC_Server.h"
+#include "Server/ServerUIComponent/ServerUIComponent.h"
 
 void setUpUI()
 {
-    UI::addStaticUIComponent<UIC_Test>("test", "Test UI");
-    UI::addStaticUIComponent<UIC_Server>("server");
+    UI::addStaticUIComponent<UITest>("test", "Test UI");
+    UI::addStaticUIComponent<ServerUIComponent>("server");
 }
 
 

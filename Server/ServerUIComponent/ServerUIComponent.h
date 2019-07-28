@@ -11,11 +11,11 @@ const QString SERVER_PATH = "Server/Server";
 
 }
 
-class UIC_Server
+class ServerUIComponent
 {
 public:
-    UIC_Server();
-    ~UIC_Server();
+    ServerUIComponent();
+    ~ServerUIComponent();
 
 private:
     QProcess* mServer_Process;

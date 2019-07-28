@@ -1,14 +1,15 @@
 #ifndef UICONFIG_H
 #define UICONFIG_H
 
-#include "UserInterface/UIConfigMacro.h"
-
+#include "UserInterface/Interface.h"
 #include "UserInterface/UITest.h"
+#include "Server/UIC_Server/UIC_Server.h"
+
+void setUpUI()
+{
+    UI::addStaticUIComponent<UIC_Test>("test", "Test UI");
+    UI::addStaticUIComponent<UIC_Server>("server");
+}
 
 
-UI_STATIC_COMPONENT(UIC_Test, "test", "Test UI")
-
-
-#undef UI_STATIC_COMPONENT
-#undef UI_STATIC_CMD_PACK
 #endif // UICONFIG_H

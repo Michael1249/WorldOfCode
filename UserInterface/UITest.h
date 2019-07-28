@@ -1,7 +1,7 @@
 #ifndef UITEST_H
 #define UITEST_H
 
-#include "UIComponentManager.h"
+#include "UIComponent.h"
 
 class UIC_Test
 {

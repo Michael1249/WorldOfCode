@@ -9,25 +9,15 @@
 namespace UI
 {
 
-/*
-singleton wrapper for UIC_t.
-
-Where UIC_t is any custom class, which has default constructor
-and contain feilds with type "Command".
-
-Naming convention: All UIComponent's type names will be started with 'UIC_'
-
-Manager define 'init' and 'exit' commands for UIC
-*/
-template<class UIC_t>
-class UIComponentManager
+template<class Pack_t>
+class UIComponent
 {
 public:
 
-    UIComponentManager(const QString& pName,
+    UIComponent(const QString& pName,
                        const QString& pHelp_tip = "",
                        bool pTrack = true);
-    ~UIComponentManager();
+    ~UIComponent();
 
 private:
 
@@ -37,7 +27,7 @@ private:
     Command mInitComponent_cmd;
     Command mExitComponent_cmd;
 
-    static UIC_t* p_component;
+    static Pack_t* p_component;
     QString mName;
     bool mFlag_Track;
 };
@@ -45,17 +35,17 @@ private:
 //===============================
 
 template <class UIC_t>
-UIC_t* UIComponentManager<UIC_t>::p_component = nullptr;
+UIC_t* UIComponent<UIC_t>::p_component = nullptr;
 
 template<class UIC_t>
-UIComponentManager<UIC_t>::UIComponentManager(const QString& pName,
+UIComponent<UIC_t>::UIComponent(const QString& pName,
                                               const QString& pHelp_tip,
                                               bool pTrack):
     mInitComponent_cmd(pName + '.' + INIT_CMD_NAME,
-                       getCommandDelegate(this, &UIComponentManager::initComponent),
+                       getCommandDelegate(this, &UIComponent::initComponent),
                        false),
     mExitComponent_cmd(pName + '.' + EXIT_CMD_NAME,
-                       getCommandDelegate(this, &UIComponentManager::exitComponent),
+                       getCommandDelegate(this, &UIComponent::exitComponent),
                        false),
     mName(pName),
     mFlag_Track(pTrack)
@@ -73,7 +63,7 @@ UIComponentManager<UIC_t>::UIComponentManager(const QString& pName,
 }
 
 template<class UIC_t>
-UIComponentManager<UIC_t>::~UIComponentManager()
+UIComponent<UIC_t>::~UIComponent()
 {
 
     if(mFlag_Track)
@@ -84,7 +74,7 @@ UIComponentManager<UIC_t>::~UIComponentManager()
 }
 
 template<class UIC_t>
-void UIComponentManager<UIC_t>::initComponent()
+void UIComponent<UIC_t>::initComponent()
 {
     if(!p_component)
     {
@@ -97,7 +87,7 @@ void UIComponentManager<UIC_t>::initComponent()
 }
 
 template<class UIC_t>
-void UIComponentManager<UIC_t>::exitComponent()
+void UIComponent<UIC_t>::exitComponent()
 {
     if(p_component)
     {

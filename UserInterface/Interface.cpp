@@ -1,6 +1,7 @@
 #include <QTextStream>
 #include "qiostream.h"
 #include "StdCommands.h"
+#include "UIConstants.h"
 #include "Interface.h"
 
 namespace UI
@@ -33,7 +34,7 @@ void Interface::run()
     using namespace qio;
     while (!mFlag_run_end)
     {
-        qout << ">>>";
+        qout << DEFAULT_INPUT;
         qout.flush();
 
         QString args_str = qin.readLine();

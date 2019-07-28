@@ -1,10 +1,30 @@
 #include "Interface.h"
 #include "qiostream.h"
+#include "UIConstants.h"
 #include "StdCommands.h"
 
-void UI::StdCommands::help_request(const QString &pStr)
+namespace UI
 {
-      auto command_map = UI::Interface::getInstance().getParser().getCommands();
+
+StdCommands::StdCommands():
+    help_request_cmd("help",getCommandDelegate(this, &StdCommands::help_request), false)
+{
+    help_request_cmd
+        .addHelpTip("helps to find command and get discription")
+        .addArg(
+            ArgInfo
+            {
+                .name="filter",
+                .short_name = 'f',
+                .help_tip = "search for commands which contain <filter>,\n"
+                            "show command's details if it's found."
+            }
+        );
+}
+
+void StdCommands::help_request(const QString &pStr)
+{
+      auto command_map = Interface::getInstance().getParser().getCommands();
 
       for(auto iter = command_map.begin(); iter != command_map.end();)
       {
@@ -20,7 +40,7 @@ void UI::StdCommands::help_request(const QString &pStr)
 
       if (command_map.size() == 0)
       {
-          qio::qout << "Nothing found" << endl;
+          qio::qout << NOTHING_FOUND_MSG << endl;
       }
       else if(command_map.size() == 1)
       {
@@ -59,7 +79,7 @@ void UI::StdCommands::help_request(const QString &pStr)
           }
           else
           {
-              qio::qout << "Without arguments." << endl;
+              qio::qout << WITHOUT_ARGUMENTS_MSG << endl;
           }
 
       }
@@ -82,3 +102,5 @@ void UI::StdCommands::help_request(const QString &pStr)
 
     qio::qout.flush();
 }
+
+} // UI

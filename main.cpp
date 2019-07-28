@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include "UserInterface/Interface.h"
-#include "UserInterface/UITest.h"
+#include "uiconfig.h"
 
 int main(int argc, char *argv[])
 {

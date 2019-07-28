@@ -30,6 +30,6 @@ private:
 
 };
 
-} // UserInterface
+} // UI
 
 #endif // COMMANDPARSER_H

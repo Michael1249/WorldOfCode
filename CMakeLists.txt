@@ -20,6 +20,7 @@ add_subdirectory(Support)
 add_subdirectory(Client)
 add_subdirectory(Server)
 add_subdirectory(UserInterface)
+add_subdirectory(RemoteInterface)
 
 add_executable(${PROJECT_NAME} "main.cpp")
 

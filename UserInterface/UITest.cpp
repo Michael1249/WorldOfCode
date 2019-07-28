@@ -1,8 +1,8 @@
 #include "qiostream.h"
 #include "UITest.h"
 
-UIC_Test::UIC_Test():
-    mFoo_cmd("test.foo", UI::getCommandDelegate(this, &UIC_Test::foo))
+UITest::UITest():
+    mFoo_cmd("test.foo", UI::getCommandDelegate(this, &UITest::foo))
 {
     mFoo_cmd.addHelpTip("test Command")
             .addArg(
@@ -15,7 +15,7 @@ UIC_Test::UIC_Test():
             );
 }
 
-void UIC_Test::foo(const QString &str)
+void UITest::foo(const QString &str)
 {
     qio::qout << __FUNCTION__ << " : " << str <<endl;
 }

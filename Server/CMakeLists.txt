@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 add_subdirectory(Game)
-add_subdirectory(UIC_Server)
+add_subdirectory(ServerUIComponent)
 
 add_executable(${PROJECT_NAME} "main.cpp")
 

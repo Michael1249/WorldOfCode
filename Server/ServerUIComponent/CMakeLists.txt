@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
-    UIC_Server.cpp
+    ServerUIComponent.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

@@ -1,8 +1,8 @@
-#include "UIC_Server.h"
+#include "ServerUIComponent.h"
 #include "qiostream.h"
 #include "qexceptionmessage.h"
 
-UIC_Server::UIC_Server()
+ServerUIComponent::ServerUIComponent()
 {
     mServer_Process = new QProcess();
     mServer_Process->start(SERVER_PATH);
@@ -35,7 +35,7 @@ UIC_Server::UIC_Server()
 
 }
 
-UIC_Server::~UIC_Server()
+ServerUIComponent::~ServerUIComponent()
 {
     mServer_Process->close();
 

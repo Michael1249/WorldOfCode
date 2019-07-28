@@ -4,7 +4,7 @@
 #include "client.h"
 
 using namespace clientSpace;
-using namespace QIO;
+using namespace qio;
 
 Client::Client(const QString pHost)
 {
@@ -73,7 +73,7 @@ void Client::sendToServer(const QString str, ConfigSpace::sendType type)
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
 
-    out << quint16(0) << type << str;
+    out << quint16(0) << (qint8)type << str;
 
     out.device()->seek(0);
     out << quint16(arrBlock.size() - sizeof(quint16));

@@ -6,7 +6,6 @@
 namespace UI
 {
 
-// point of entry. Init Interface with standard commands
 void Run();
 
 // Singleton
@@ -20,8 +19,8 @@ public:
 
 private:
 
-    Interface() = default;
     Q_DISABLE_COPY_MOVE(Interface)
+    Interface() = default;
 
     // only Command can add/remove itself to Interface
     friend class Command;

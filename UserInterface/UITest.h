@@ -1,31 +1,17 @@
-#ifndef UICONSTANTS_H
-#define UICONSTANTS_H
+#ifndef UITEST_H
+#define UITEST_H
 
-#include "qiostream.h"
 #include "UIComponentManager.h"
 
-UI_STATIC_COMPONENT(UIC_Test, "test", "test UIC manager")
 class UIC_Test
 {
-    void foo(const QString& str)
-    {
-        qio::qout << __FUNCTION__ << " : " << str <<endl;
-    }
+public:
+    UIC_Test();
 
-    UI::Command cmd_help_request = std::move(
-            UI::Command("foo")
-            .linkTo( this, &UIC_Test::foo)
-            .addArg(
-                UI::ArgInfo
-                {
-                    .name="str",
-                    .short_name = 's',
-                    .help_tip = "arg help tip"
-                }
-             )
-             .addHelpTip("command help tip")
-        );
+private:
+    void foo(const QString& str);
+    UI::Command mFoo_cmd;
 
 };
 
-#endif // UICONSTANTS_H
+#endif // UITEST_H

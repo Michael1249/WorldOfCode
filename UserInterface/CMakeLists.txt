@@ -6,10 +6,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
+    UIConstants.cpp
     Interface.cpp
     CommandParser.cpp
     Command.cpp
     StdCommands.cpp
+    UITest.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

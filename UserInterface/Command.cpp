@@ -1,67 +1,33 @@
-#include <QStringList>
-#include <QtDebug>
 #include "Interface.h"
 #include "qiostream.h"
+#include "qexceptionmessage.h"
+#include "UIConstants.h"
 #include "Command.h"
+
 
 namespace UI
 {
 
-Command::Command(Command &&temp):
-    mName(std::move(temp.mName)),
-    mHelp_tip(std::move(temp.mHelp_tip)),
-    mArguments(temp.mArguments),
-    mAdapter(std::move(temp.mAdapter)),
-    mDisable_reason(std::move(temp.mDisable_reason)),
-    mFlag_track(temp.mFlag_track)
-{
-    Interface::getInstance().addCommand(*this);
-}
-
-Command::Command(const QString pName, bool pTrack):
+Command::Command(const QString pName, std::unique_ptr<ICommandDelegate> pDelegate, bool pTrack):
     mName(pName),
+    mDelegate(std::move(pDelegate)),
     mFlag_track(pTrack)
 {
     Interface::getInstance().addCommand(*this);
 
     if(mFlag_track)
     {
-        qio::qout << '+' << getName() << endl;
-    }
-}
-
-Command::Command(std::unique_ptr<ICommandDelegate> pAdapter,
-                 const QString& pName,
-                 const QList<ArgInfo>& pArguments,
-                 const QString& pHelp_tip,
-                 bool pTrack):
-    mName(pName),
-    mHelp_tip(pHelp_tip),
-    mArguments(pArguments),
-    mAdapter(std::move(pAdapter)),
-    mFlag_track(pTrack)
-{
-    Interface::getInstance().addCommand(*this);
-
-    if(mFlag_track)
-    {
-        qio::qout << '+' << getName() << endl;
+        qio::qout << CMD_INIT_MSG << getName() << endl;
     }
 }
 
 Command::~Command()
 {
     Interface::getInstance().removeCommand(*this);
-    if(mFlag_track && mAdapter)
+    if(mFlag_track)
     {
-        qio::qout << '-' << getName() << endl;
+        qio::qout << CMD_EXIT_MSG << getName() << endl;
     }
-}
-
-Command& Command::linkTo(std::unique_ptr<ICommandDelegate> pAdapter)
-{
-    mAdapter = std::move(pAdapter);
-    return *this;
 }
 
 Command& Command::addArg(const ArgInfo& pArg)
@@ -76,12 +42,6 @@ Command& Command::addHelpTip(const QString& pHelp_tip)
     return *this;
 }
 
-Command& Command::addDisableReason(const QString& pReason)
-{
-    mDisable_reason = pReason;
-    return *this;
-}
-
 void Command::exec(const QString& pArgs) const
 {
 
@@ -92,7 +52,7 @@ void Command::exec(const QString& pArgs) const
         try
         {
             QVector<QString> val_list = parseArgLine(arg_list);
-            mAdapter.get()->Invoke(val_list);
+            mDelegate.get()->Invoke(val_list);
         }
         catch (QExceptionMessage& e)
         {
@@ -124,7 +84,7 @@ void Command::disable(const QString& pReason)
     }
     else
     {
-        mDisable_reason = "command disabled";
+        mDisable_reason = CMD_DISABLE_REASON;
     }
 
     mIs_enable = false;
@@ -237,7 +197,7 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
             }
             else
             {
-                throw QExceptionMessage("Unknown argument name <" + name + '>' );
+                throw QExceptionMessage(ERR_UNKNOWN_ARG.arg(name));
             }
 
         }
@@ -245,13 +205,18 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
         {
             if(!flag_ban_positional)
             {
+
+                if(i >= values.size())
+                {
+                    throw QExceptionMessage(ERR_TOO_MANY_ARGS.arg(values.size()));
+                }
+
                 values[i] = current_arg.size() ? removeBrackets(current_arg) : mArguments[i].default_value;
                 setted_values[i] = true;
             }
             else
             {
-                throw QExceptionMessage("Positional argument \"" + current_arg
-                                        + "\" must be placed before nemed argument(s)" );
+                throw QExceptionMessage(ERR_INVALID_ARG.arg(current_arg));
             }
 
         }

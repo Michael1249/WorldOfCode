@@ -1,17 +1,28 @@
 #include "qiostream.h"
+#include "qexceptionmessage.h"
+#include "UIConstants.h"
 #include "CommandParser.h"
 
-void UI::CommandParser::addCommand(const Command &pCommand)
+namespace UI
 {
+
+void CommandParser::addCommand(const Command &pCommand)
+{
+
+    if (mCommands.find(pCommand.getName()) != mCommands.end())
+    {
+        throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pCommand.getName()));
+    }
+
     mCommands.insert(pCommand.getName(), &pCommand);
 }
 
-void UI::CommandParser::removeCommand(const Command &pCommand)
+void CommandParser::removeCommand(const Command &pCommand)
 {
     mCommands.remove(pCommand.getName());
 }
 
-void UI::CommandParser::parseString(const QString& pCommand_str)
+void CommandParser::parseString(const QString& pCommand_str)
 {
     //TODO: owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);
@@ -27,7 +38,7 @@ void UI::CommandParser::parseString(const QString& pCommand_str)
         }
         else
         {
-            qio::qout << "[ERROR]: Unknown command!" << endl;
+            qio::qout << "[ERROR]:" << ERR_UNCNOWN_CMD << endl;
             qio::qout.flush();
         }
 
@@ -35,12 +46,12 @@ void UI::CommandParser::parseString(const QString& pCommand_str)
 
 }
 
-const UI::CommandParser::command_map &UI::CommandParser::getCommands() const
+const CommandParser::command_map &CommandParser::getCommands() const
 {
     return mCommands;
 }
 
-UI::CommandParser::command_map UI::CommandParser::getActiveCommands() const
+CommandParser::command_map CommandParser::getActiveCommands() const
 {
     command_map result;
     for(auto command : mCommands)
@@ -54,3 +65,5 @@ UI::CommandParser::command_map UI::CommandParser::getActiveCommands() const
     }
     return result;
 }
+
+} // UI

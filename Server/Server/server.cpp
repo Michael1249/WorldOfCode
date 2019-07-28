@@ -4,20 +4,10 @@
 #include <config.h>
 
 using namespace serverSpace;
-using namespace QIO;
+using namespace qio;
 
 void Server::start()
 {
-    mptrServer = new QTcpServer(this);
-
-     if (!mptrServer->listen(QHostAddress::Any, pPort)) {
-         qio::qout << "Unable to start the server:" + mptrServer->errorString() << endl;
-         mptrServer->close();
-         return;
-     }
-
-    connect(mptrServer, &QTcpServer::newConnection, this, &Server::slotNewConnection);
-
     if(!mptrServer->listen(QHostAddress::Any, ConfigSpace::PORT))
         qout << "Server is not started. " << mptrServer->errorString() << endl;
     else
@@ -62,10 +52,6 @@ void Server::slotReadClient()
         QString str;
         quint8 type;
 
-        QString strMessage =
-            time.toString() + " " + "Client has sended - " + str;
-        qio::qout << strMessage << endl;
-
         in >> type >> str;
 
         mi16_nextBlockSize = 0;
@@ -79,7 +65,6 @@ void Server::slotReadClient()
 
 void Server::slotClientDisconnect()
 {
-    using namespace QIO;
     QTcpSocket* clientSocket = static_cast<QTcpSocket*>(sender());
 
     qout << mClientSockets.size() << endl;

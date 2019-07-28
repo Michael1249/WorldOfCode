@@ -2,25 +2,34 @@
 #define CLIENT_H
 
 #include <QtNetwork/QTcpSocket>
-#include <QDataStream>
-#include <QTime>
+#include <QObject>
+#include <QFile>
+#include <config.h>
 
 namespace clientSpace
 {
 
-class Client : public QTcpSocket
+class Client : QTcpSocket
 {
 Q_OBJECT
-private:
-    QTcpSocket* mptrSocket;
-    quint16 mNextBlockSize;
+
 public:
-    Client(const QString pHost, quint16 pPort);
+    Client(const QString pHost);
+    ~Client() {
+        mp_clientSocket->close();
+        mp_clientSocket->deleteLater();
+    }
+
+    void sendToServer(const QString str, const ConfigSpace::sendType type = ConfigSpace::COMMAND);
+    void sendToServer(QFile*);
+private:
+    QTcpSocket *mp_clientSocket;
+    qint16 mi16_nextBlockSize;
+
 private slots:
-    void slotReadyRead();
-    void slotError(QAbstractSocket::SocketError);
-    void slotSendToServer();
+    void slotReadServer();
     void slotConnected();
+    void slotError(QAbstractSocket::SocketError);
 };
 
 }

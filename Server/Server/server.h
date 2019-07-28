@@ -27,6 +27,9 @@ public:
     void sendToAllClients(const QString pMessage);
     void start();
     void shutdown();
+
+    enum typeSend {FILE, COMMAND};
+
     ~Server() {delete mptrServer;}
 };
 

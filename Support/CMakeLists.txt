@@ -5,6 +5,7 @@ project(Support)
 set(SOURCES
     delegate.h
     qiostream.cpp
+    config.h
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

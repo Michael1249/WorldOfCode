@@ -1,9 +1,10 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-
 #include <QtNetwork/QTcpSocket>
 #include <QObject>
+#include <QFile>
+#include <config.h>
 
 namespace clientSpace
 {
@@ -14,9 +15,13 @@ Q_OBJECT
 
 public:
     Client(const QString pHost);
-    ~Client() { delete mp_clientSocket; }
+    ~Client() {
+        mp_clientSocket->close();
+        mp_clientSocket->deleteLater();
+    }
 
-    void sendToServer(const QString);
+    void sendToServer(const QString str, const ConfigSpace::sendType type = ConfigSpace::COMMAND);
+    void sendToServer(QFile*);
 private:
     QTcpSocket *mp_clientSocket;
     qint16 mi16_nextBlockSize;
@@ -28,6 +33,5 @@ private slots:
 };
 
 }
-
 
 #endif // CLIENT_H

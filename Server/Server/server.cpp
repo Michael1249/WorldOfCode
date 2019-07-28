@@ -1,8 +1,10 @@
 #include <QDataStream>
 #include "server.h"
 #include "qiostream.h"
+#include <config.h>
 
 using namespace serverSpace;
+using namespace QIO;
 
 void Server::start()
 {
@@ -10,12 +12,12 @@ void Server::start()
 
     connect(mptrServer, &QTcpServer::newConnection, this, &Server::slotNewConnection);
 
-    if(!mptrServer->listen(QHostAddress::Any, 9999))
-        QIO::qout << "Server is not started. " << mptrServer->errorString() << endl;
+    if(!mptrServer->listen(QHostAddress::Any, ConfigSpace::PORT))
+        qout << "Server is not started. " << mptrServer->errorString() << endl;
     else
-        QIO::qout << "Server is started" << endl;
+        qout << "Server is started" << endl;
 
-    QIO::qout.flush();
+    qout.flush();
 }
 
 void Server::slotNewConnection()
@@ -23,8 +25,8 @@ void Server::slotNewConnection()
     QTcpSocket* clientSocket = mptrServer->nextPendingConnection();
     qint64 socketID = clientSocket->socketDescriptor();
 
-    QIO::qout << "New connection. Socket ID " << socketID << endl;
-    QIO::qout.flush();
+    qout << "New connection. Socket ID " << socketID << endl;
+    qout.flush();
 
     mClientSockets[socketID] = clientSocket;
 
@@ -52,13 +54,14 @@ void Server::slotReadClient()
         if(clientSocket->bytesAvailable() < mi16_nextBlockSize) break;
 
         QString str;
+        quint8 type;
 
-        in >> str;
+        in >> type >> str;
 
         mi16_nextBlockSize = 0;
 
-        QIO::qout << "Client send: " << str << endl;
-        QIO::qout.flush();
+        qout << "Client send: " << str << " type: " << (type == 0 ? "FILE" : "COMMAND") << endl;
+        qout.flush();
     }
 
     clientSocket->flush();
@@ -107,9 +110,10 @@ void Server::shutdown()
 {
     for(auto& i: mClientSockets)
     {
-        i->write("Server shutdowned.\n");
+        i->write("Server shutdown.\n");
         i->close();
     }
 
     mptrServer->close();
+    mptrServer->deleteLater();
 }

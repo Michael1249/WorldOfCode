@@ -1,10 +1,13 @@
 #include <QCoreApplication>
-#include <qiostream.h>
-#include "Server/server.h"
-
+#include <iostream>
+#include <string>
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    serverSpace::Server c(2323);
+
+    std::string s;
+    std::cin >> s;
+    std::cout << s << std::endl;
+
     return a.exec();
 }

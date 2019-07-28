@@ -2,11 +2,24 @@
 #define INTERFACE_H
 
 #include "CommandParser.h"
+#include "UIComponent.h"
 
 namespace UI
 {
 
 void Run();
+
+template <class Pack_t>
+void addStaticCmdPack()
+{
+    static Pack_t pack;
+}
+
+template <class Pack_t>
+void addStaticUIComponent(QString pName, QString pHelp_tip = "")
+{
+    static UI::UIComponent<Pack_t> component(pName, pHelp_tip, false);
+}
 
 // Singleton
 class Interface

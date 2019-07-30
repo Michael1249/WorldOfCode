@@ -28,7 +28,7 @@ void StdCommands::help_request(const QString &pStr)
 
       for(auto iter = command_map.begin(); iter != command_map.end();)
       {
-          if(!iter.value()->getName().contains(pStr, Qt::CaseInsensitive))
+          if(!iter.value()->getInfo().getName().contains(pStr, Qt::CaseInsensitive))
           {
                iter = command_map.erase(iter);
           }
@@ -45,25 +45,25 @@ void StdCommands::help_request(const QString &pStr)
       else if(command_map.size() == 1)
       {
           auto command = command_map.begin().value();
-          qio::qout << command->getName();
+          qio::qout << command->getInfo().getName();
 
-          for (auto& arg: command->getArgumentsInfo())
+          for (auto& arg: command->getInfo().getArgumentsInfo())
           {
               qio::qout << QString(" <%1>").arg(arg.name);
           }
 
           qio::qout << endl;
 
-          if(command->hasHelpTip())
+          if(command->getInfo().hasHelpTip())
           {
-              qio::qout << command->getHelpTip() << endl;
+              qio::qout << command->getInfo().getHelpTip() << endl;
           }
 
-          if(command->getArgumentsInfo().size())
+          if(command->getInfo().getArgumentsInfo().size())
           {
               qio::qout << left;
 
-              for (auto& arg: command->getArgumentsInfo())
+              for (auto& arg: command->getInfo().getArgumentsInfo())
               {
                   qio::qout << QString(40, '_')
                             << endl
@@ -89,12 +89,12 @@ void StdCommands::help_request(const QString &pStr)
           {
               qio::qout << qSetFieldWidth(16)
                         << left
-                        << command->getName();
-              if(command->hasHelpTip())
+                        << command->getInfo().getName();
+              if(command->getInfo().hasHelpTip())
               {
                   qio::qout << qSetFieldWidth(0)
                             << " : "
-                            << command->getHelpTip();
+                            << command->getInfo().getHelpTip();
               }
               qio::qout << endl;
           }

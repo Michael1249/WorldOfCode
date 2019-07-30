@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <QMap>
+#include <QPointer>
 #include <QString>
 #include "Command.h"
 
@@ -13,7 +14,7 @@ class CommandParser
 {
 public:
 
-    using command_map = QMap<QString,const Command*>;
+    using command_map = QMap<QString, QPointer<CallCommandSignal>>;
 
     CommandParser() = default;
 
@@ -22,7 +23,6 @@ public:
     void parseString(const QString& pCommand_str);
 
     const command_map& getCommands() const;
-    command_map getActiveCommands() const;
 
 private:
 

@@ -9,7 +9,7 @@ namespace UI
 {
 
 Command::Command(const QString pName, std::unique_ptr<ICommandDelegate> pDelegate, bool pTrack):
-    mName(pName),
+    mInfo(pName),
     mDelegate(std::move(pDelegate)),
     mFlag_track(pTrack)
 {
@@ -17,7 +17,7 @@ Command::Command(const QString pName, std::unique_ptr<ICommandDelegate> pDelegat
 
     if(mFlag_track)
     {
-        qio::qout << CMD_INIT_MSG << getName() << endl;
+        qio::qout << CMD_INIT_MSG << mInfo.getName() << endl;
     }
 }
 
@@ -26,23 +26,23 @@ Command::~Command()
     Interface::getInstance().removeCommand(*this);
     if(mFlag_track)
     {
-        qio::qout << CMD_EXIT_MSG << getName() << endl;
+        qio::qout << CMD_EXIT_MSG << mInfo.getName() << endl;
     }
 }
 
 Command& Command::addArg(const ArgInfo& pArg)
 {
-    mArguments.append(pArg);
+    mInfo.setArg(pArg);
     return *this;
 }
 
 Command& Command::addHelpTip(const QString& pHelp_tip)
 {
-    mHelp_tip = pHelp_tip;
+    mInfo.setHelpTip(pHelp_tip);
     return *this;
 }
 
-void Command::exec(const QString& pArgs) const
+void Command::exec_slot(const QString& pArgs) const
 {
 
     if(mIs_enable)
@@ -95,24 +95,9 @@ bool Command::isEnable() const
     return mIs_enable;
 }
 
-const QString& Command::getName() const
+const CommandInfo &Command::getInfo() const
 {
-    return mName;
-}
-
-const QString& Command::getHelpTip() const
-{
-    return mHelp_tip;
-}
-
-const QList<ArgInfo>& Command::getArgumentsInfo() const
-{
-    return mArguments;
-}
-
-bool Command::hasHelpTip() const
-{
-    return mHelp_tip.size();
+    return mInfo;
 }
 
 // NOT MY CODE
@@ -165,8 +150,8 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
 {
     QVector<QString> values;
     QVector<bool> setted_values;
-    values.resize(mArguments.size());
-    setted_values.resize(mArguments.size());
+    values.resize(mInfo.getArgumentsInfo().size());
+    setted_values.resize(mInfo.getArgumentsInfo().size());
     bool flag_ban_positional = false;
 
     for (int i = 0; i < args_list.size(); ++i)
@@ -180,10 +165,10 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
             QString val = current_arg.section('=', 1);
 
             int arg_pos = -1;
-            for (int j = 0; j < mArguments.size(); ++j)
+            for (int j = 0; j < mInfo.getArgumentsInfo().size(); ++j)
             {
 
-                if(name == mArguments[j].name || name == mArguments[j].short_name)
+                if(name == mInfo.getArgumentsInfo()[j].name || name == mInfo.getArgumentsInfo()[j].short_name)
                 {
                     arg_pos = j;
                     break;
@@ -192,7 +177,9 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
             }
             if(arg_pos != -1)
             {
-                values[arg_pos] = val.size() ? removeBrackets(val) : mArguments[arg_pos].default_value;
+                values[arg_pos] = val.size() ?
+                            removeBrackets(val) :
+                            mInfo.getArgumentsInfo()[arg_pos].default_value;
                 setted_values[arg_pos] = true;
             }
             else
@@ -211,7 +198,9 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
                     throw QExceptionMessage(ERR_TOO_MANY_ARGS.arg(values.size()));
                 }
 
-                values[i] = current_arg.size() ? removeBrackets(current_arg) : mArguments[i].default_value;
+                values[i] = current_arg.size() ?
+                            removeBrackets(current_arg) :
+                            mInfo.getArgumentsInfo()[i].default_value;
                 setted_values[i] = true;
             }
             else
@@ -228,11 +217,61 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
 
         if(!setted_values[i])
         {
-            values[i] = mArguments[i].default_value;
+            values[i] = mInfo.getArgumentsInfo()[i].default_value;
         }
 
     }
     return values;
+}
+
+CommandInfo::CommandInfo(const QString &pName):
+    mName(pName)
+{
+}
+
+void CommandInfo::setName(const QString &pNaame)
+{
+    mName = pNaame;
+}
+
+void CommandInfo::setArg(const ArgInfo &pArg)
+{
+    mArguments.append(pArg);
+}
+
+void CommandInfo::setHelpTip(const QString &pHelp_tip)
+{
+    mHelp_tip = pHelp_tip;
+}
+
+const QString &CommandInfo::getName() const
+{
+    return mName;
+}
+
+const QString &CommandInfo::getHelpTip() const
+{
+    return mHelp_tip;
+}
+
+const QList<ArgInfo> &CommandInfo::getArgumentsInfo() const
+{
+    return mArguments;
+}
+
+bool CommandInfo::hasHelpTip() const
+{
+    return mHelp_tip.size();
+}
+
+const CommandInfo &CallCommandSignal::getInfo() const
+{
+    return *mInfo_ptr;
+}
+
+void CallCommandSignal::setInfo(const CommandInfo& pInfo)
+{
+    mInfo_ptr = &pInfo;
 }
 
 } // UI

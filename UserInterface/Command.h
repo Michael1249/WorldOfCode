@@ -2,6 +2,7 @@
 #define COMMAND_H
 
 #include <memory>
+#include <QObject>
 #include <QVector>
 #include "CommandDelegate.h"
 
@@ -17,6 +18,41 @@ struct ArgInfo
     QString default_value = "";
 };
 
+class CommandInfo
+{
+public:
+    CommandInfo(const QString& pName);
+
+    void setName(const QString& pNaame);
+    void setArg(const ArgInfo& pArg);
+    void setHelpTip(const QString& pHelp_tip);
+
+    const QString& getName() const;
+    const QString& getHelpTip() const;
+    const QList<ArgInfo>& getArgumentsInfo() const;
+    bool hasHelpTip() const;
+
+private:
+    QString mName;
+    QString mHelp_tip;
+    QList<ArgInfo> mArguments;
+};
+
+class CallCommandSignal:public QObject
+{
+    Q_OBJECT
+public:
+    const CommandInfo& getInfo() const;
+    void setInfo(const CommandInfo& pInfo);
+    //void copyInfo(); in future for remote commands
+
+signals:
+    void exec(const QString&);
+
+private:
+    CommandInfo const* mInfo_ptr;
+};
+
 /*
 Represetn interface between User (Input) and c++ function
 
@@ -24,8 +60,9 @@ Provide to call function with user's input string line
 
 Note: each argument of function must to be able to initializate by QString object
 */
-class Command
+class Command: public QObject
 {
+    Q_OBJECT
 
 public:
 
@@ -37,25 +74,21 @@ public:
     Command& addArg(const ArgInfo& pArg);
     Command& addHelpTip(const QString& pHelp_tip);
 
-    void exec(const QString& pArgs) const;
-
     void enable();
     void disable(const QString& pReason = "");
     bool isEnable() const;
 
-    const QString& getName() const;
-    const QString& getHelpTip() const;
-    const QList<ArgInfo>& getArgumentsInfo() const;
-    bool hasHelpTip() const;
+    const CommandInfo& getInfo() const;
+
+private slots:
+    void exec_slot(const QString& pArgs) const;
 
 private:
 
     static QStringList splitArgsLine(const QString & pArgs_str);
     QVector<QString> parseArgLine(const QStringList& args_list) const;
 
-    QString mName;
-    QString mHelp_tip;
-    QList<ArgInfo> mArguments;
+    CommandInfo mInfo;
     std::unique_ptr<ICommandDelegate> mDelegate;
 
     bool mIs_enable = true;

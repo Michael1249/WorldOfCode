@@ -9,17 +9,19 @@ namespace UI
 void CommandParser::addCommand(const Command &pCommand)
 {
 
-    if (mCommands.find(pCommand.getName()) != mCommands.end())
+    if (mCommands.find(pCommand.getInfo().getName()) != mCommands.end())
     {
-        throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pCommand.getName()));
+        throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pCommand.getInfo().getName()));
     }
 
-    mCommands.insert(pCommand.getName(), &pCommand);
+    auto signal = mCommands.insert(pCommand.getInfo().getName(), QPointer<CallCommandSignal>(new CallCommandSignal())).value().data();
+    signal->setInfo(pCommand.getInfo());
+    QObject::connect(signal, SIGNAL(exec(const QString&)), &pCommand, SLOT(exec_slot(const QString&)));
 }
 
 void CommandParser::removeCommand(const Command &pCommand)
 {
-    mCommands.remove(pCommand.getName());
+    mCommands.remove(pCommand.getInfo().getName());
 }
 
 void CommandParser::parseString(const QString& pCommand_str)
@@ -38,7 +40,7 @@ void CommandParser::parseString(const QString& pCommand_str)
         }
         else
         {
-            qio::qout << "[ERROR]:" << ERR_UNCNOWN_CMD << endl;
+            qio::qout << "[ERROR]:" << ERR_UNKNOWN_CMD << endl;
             qio::qout.flush();
         }
 
@@ -49,21 +51,6 @@ void CommandParser::parseString(const QString& pCommand_str)
 const CommandParser::command_map &CommandParser::getCommands() const
 {
     return mCommands;
-}
-
-CommandParser::command_map CommandParser::getActiveCommands() const
-{
-    command_map result;
-    for(auto command : mCommands)
-    {
-
-        if(command->isEnable())
-        {
-            result.insert(command->getName(), command);
-        }
-
-    }
-    return result;
 }
 
 } // UI

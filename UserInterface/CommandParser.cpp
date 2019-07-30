@@ -14,8 +14,11 @@ void CommandParser::addCommand(const Command &pCommand)
         throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pCommand.getInfo().getName()));
     }
 
-    auto signal = mCommands.insert(pCommand.getInfo().getName(), QPointer<CallCommandSignal>(new CallCommandSignal())).value().data();
-    signal->setInfo(pCommand.getInfo());
+    auto signal = mCommands.insert(
+                pCommand.getInfo().getName(),
+                QPointer<CommandRepresent>(new CommandRepresent(pCommand.getInfo()))
+    ).value().data();
+
     QObject::connect(signal, SIGNAL(exec(const QString&)), &pCommand, SLOT(exec_slot(const QString&)));
 }
 

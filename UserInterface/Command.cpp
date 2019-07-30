@@ -264,12 +264,17 @@ bool CommandInfo::hasHelpTip() const
     return mHelp_tip.size();
 }
 
-const CommandInfo &CallCommandSignal::getInfo() const
+CommandRepresent::CommandRepresent(const CommandInfo &pInfo):
+    mInfo_ptr(&pInfo)
+{
+}
+
+const CommandInfo &CommandRepresent::getInfo() const
 {
     return *mInfo_ptr;
 }
 
-void CallCommandSignal::setInfo(const CommandInfo& pInfo)
+void CommandRepresent::setInfo(const CommandInfo& pInfo)
 {
     mInfo_ptr = &pInfo;
 }

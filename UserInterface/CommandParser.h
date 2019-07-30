@@ -14,7 +14,7 @@ class CommandParser
 {
 public:
 
-    using command_map = QMap<QString, QPointer<CallCommandSignal>>;
+    using command_map = QMap<QString, QPointer<CommandRepresent>>;
 
     CommandParser() = default;
 

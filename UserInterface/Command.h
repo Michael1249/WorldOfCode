@@ -38,10 +38,12 @@ private:
     QList<ArgInfo> mArguments;
 };
 
-class CallCommandSignal:public QObject
+class CommandRepresent:public QObject
 {
     Q_OBJECT
 public:
+    CommandRepresent(const CommandInfo& pInfo);
+
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
     //void copyInfo(); in future for remote commands

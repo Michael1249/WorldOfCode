@@ -27,15 +27,12 @@ private:
     Command mInitComponent_cmd;
     Command mExitComponent_cmd;
 
-    static Pack_t* p_component;
+    Pack_t* mComponent_ptr;
     QString mName;
     bool mFlag_Track;
 };
 
 //===============================
-
-template <class UIC_t>
-UIC_t* UIComponent<UIC_t>::p_component = nullptr;
 
 template<class UIC_t>
 UIComponent<UIC_t>::UIComponent(const QString& pName,
@@ -76,9 +73,9 @@ UIComponent<UIC_t>::~UIComponent()
 template<class UIC_t>
 void UIComponent<UIC_t>::initComponent()
 {
-    if(!p_component)
+    if(!mComponent_ptr)
     {
-        p_component = new UIC_t();
+        mComponent_ptr = new UIC_t();
     }
 
     mInitComponent_cmd.disable(INIT_CMD_DISABLE_REASON);
@@ -89,10 +86,10 @@ void UIComponent<UIC_t>::initComponent()
 template<class UIC_t>
 void UIComponent<UIC_t>::exitComponent()
 {
-    if(p_component)
+    if(mComponent_ptr)
     {
-        delete p_component;
-        p_component = nullptr;
+        delete mComponent_ptr;
+        mComponent_ptr = nullptr;
     }
 
     mInitComponent_cmd.enable();

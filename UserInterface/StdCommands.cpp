@@ -6,11 +6,12 @@
 namespace UI
 {
 
-StdCommands::StdCommands():
-    help_request_cmd("help",getCommandDelegate(this, &StdCommands::help_request), false)
+StdCommands::StdCommands()
 {
-    help_request_cmd
-        .addHelpTip("helps to find command and get discription")
+    mHelp_request_cmd
+        .setName("help")
+        .link_to(this, &StdCommands::help_request)
+        .setHelpTip("helps to find command and get discription")
         .addArg(
             ArgInfo
             {
@@ -19,7 +20,7 @@ StdCommands::StdCommands():
                 .help_tip = "search for commands which contain <filter>,\n"
                             "show command's details if it's found."
             }
-        );
+        ).addToUI(false);
 }
 
 void StdCommands::help_request(const QString &pStr)

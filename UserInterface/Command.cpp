@@ -8,19 +8,6 @@
 namespace UI
 {
 
-Command::Command(const QString pName, std::unique_ptr<ICommandDelegate> pDelegate, bool pTrack):
-    mInfo(pName),
-    mDelegate(std::move(pDelegate)),
-    mFlag_track(pTrack)
-{
-    Interface::getInstance().addCommand(*this);
-
-    if(mFlag_track)
-    {
-        qio::qout << CMD_INIT_MSG << mInfo.getName() << endl;
-    }
-}
-
 Command::~Command()
 {
     Interface::getInstance().removeCommand(*this);
@@ -30,16 +17,33 @@ Command::~Command()
     }
 }
 
+Command &Command::setName(const QString &pName)
+{
+    mInfo.setName(pName);
+    return *this;
+}
+
 Command& Command::addArg(const ArgInfo& pArg)
 {
     mInfo.setArg(pArg);
     return *this;
 }
 
-Command& Command::addHelpTip(const QString& pHelp_tip)
+Command& Command::setHelpTip(const QString& pHelp_tip)
 {
     mInfo.setHelpTip(pHelp_tip);
     return *this;
+}
+
+void Command::addToUI(bool pTrack)
+{
+    Interface::getInstance().addCommand(*this);
+
+    mFlag_track = pTrack;
+    if(mFlag_track)
+    {
+        qio::qout << CMD_INIT_MSG << mInfo.getName() << endl;
+    }
 }
 
 void Command::exec_slot(const QString& pArgs) const
@@ -224,11 +228,6 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
     return values;
 }
 
-CommandInfo::CommandInfo(const QString &pName):
-    mName(pName)
-{
-}
-
 void CommandInfo::setName(const QString &pNaame)
 {
     mName = pNaame;
@@ -265,18 +264,18 @@ bool CommandInfo::hasHelpTip() const
 }
 
 CommandRepresent::CommandRepresent(const CommandInfo &pInfo):
-    mInfo_ptr(&pInfo)
+    mInfo(pInfo)
 {
 }
 
 const CommandInfo &CommandRepresent::getInfo() const
 {
-    return *mInfo_ptr;
+    return mInfo;
 }
 
 void CommandRepresent::setInfo(const CommandInfo& pInfo)
 {
-    mInfo_ptr = &pInfo;
+    mInfo = pInfo;
 }
 
 } // UI

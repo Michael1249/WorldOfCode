@@ -16,7 +16,7 @@ public:
 private:
 
     void help_request(const QString& pStr);
-    Command help_request_cmd;
+    Command mHelp_request_cmd;
 
 };
 

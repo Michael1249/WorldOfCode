@@ -36,20 +36,23 @@ private:
 
 template<class UIC_t>
 UIComponent<UIC_t>::UIComponent(const QString& pName,
-                                              const QString& pHelp_tip,
-                                              bool pTrack):
-    mInitComponent_cmd(pName + '.' + INIT_CMD_NAME,
-                       getCommandDelegate(this, &UIComponent::initComponent),
-                       false),
-    mExitComponent_cmd(pName + '.' + EXIT_CMD_NAME,
-                       getCommandDelegate(this, &UIComponent::exitComponent),
-                       false),
+                                const QString& pHelp_tip,
+                                bool pTrack):
     mName(pName),
     mFlag_Track(pTrack)
 {
 
-    mInitComponent_cmd.addHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
-    mExitComponent_cmd.addHelpTip(EXIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
+    mInitComponent_cmd
+            .setName(pName + '.' + INIT_CMD_NAME)
+            .link_to(this, &UIComponent::initComponent)
+            .setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip))
+            .addToUI(false);
+
+    mExitComponent_cmd
+            .setName(pName + '.' + EXIT_CMD_NAME)
+            .link_to(this, &UIComponent::exitComponent)
+            .setHelpTip(EXIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip))
+            .addToUI(false);
     mExitComponent_cmd.disable();
 
     if(mFlag_Track)

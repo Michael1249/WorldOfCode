@@ -21,7 +21,6 @@ struct ArgInfo
 class CommandInfo
 {
 public:
-    CommandInfo(const QString& pName);
 
     void setName(const QString& pNaame);
     void setArg(const ArgInfo& pArg);
@@ -46,13 +45,12 @@ public:
 
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
-    //void copyInfo(); in future for remote commands
 
 signals:
     void exec(const QString&);
 
 private:
-    CommandInfo const* mInfo_ptr;
+    CommandInfo mInfo;
 };
 
 /*
@@ -69,12 +67,15 @@ class Command: public QObject
 public:
 
     Q_DISABLE_COPY_MOVE(Command)
-    Command(const QString pName, std::unique_ptr<ICommandDelegate> pDelegate , bool pTrack = true);
-
+    Command() = default;
     ~Command();
 
+    Command& setName(const QString& pName);
     Command& addArg(const ArgInfo& pArg);
-    Command& addHelpTip(const QString& pHelp_tip);
+    Command& setHelpTip(const QString& pHelp_tip);
+    template<class Obj_t, class MFunc_t>
+    Command& link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
+    void addToUI(bool pTrack = true);
 
     void enable();
     void disable(const QString& pReason = "");
@@ -99,6 +100,13 @@ private:
     //if true, track creation and destruction and output to console
     bool mFlag_track;
 };
+
+template<class Obj_t, class MFunc_t>
+Command &Command::link_to(Obj_t *pObj_ptr, MFunc_t pMfunc_ptr)
+{
+    mDelegate = getCommandDelegate(pObj_ptr, pMfunc_ptr);
+    return *this;
+}
 
 } //UI
 

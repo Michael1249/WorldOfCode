@@ -5,10 +5,15 @@ project(Server VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-add_subdirectory(Game)
+add_subdirectory(GameTemplate)
 add_subdirectory(ServerUIComponent)
 
-add_executable(${PROJECT_NAME} "main.cpp")
+set(SOURCES
+    main.cpp
+    Server.cpp
+    )
+
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${SUPPORT_DIR})
 target_link_libraries(${PROJECT_NAME} Qt5::Core)

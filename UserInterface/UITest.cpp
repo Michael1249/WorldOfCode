@@ -1,10 +1,11 @@
 #include "qiostream.h"
 #include "UITest.h"
 
-UITest::UITest():
-    mFoo_cmd("test.foo", UI::getCommandDelegate(this, &UITest::foo))
+UITest::UITest()
 {
-    mFoo_cmd.addHelpTip("test Command")
+    mFoo_cmd.setName("test.foo")
+            .link_to(this, &UITest::foo)
+            .setHelpTip("test Command")
             .addArg(
                 UI::ArgInfo
                 {
@@ -12,7 +13,7 @@ UITest::UITest():
                     .short_name = 's',
                     .help_tip = "some help"
                 }
-            );
+            ).addToUI();
 }
 
 void UITest::foo(const QString &str)

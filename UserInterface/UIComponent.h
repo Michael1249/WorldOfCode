@@ -27,32 +27,32 @@ private:
     Command mInitComponent_cmd;
     Command mExitComponent_cmd;
 
-    static Pack_t* p_component;
+    Pack_t* mComponent_ptr;
     QString mName;
     bool mFlag_Track;
 };
 
 //===============================
 
-template <class UIC_t>
-UIC_t* UIComponent<UIC_t>::p_component = nullptr;
-
 template<class UIC_t>
 UIComponent<UIC_t>::UIComponent(const QString& pName,
-                                              const QString& pHelp_tip,
-                                              bool pTrack):
-    mInitComponent_cmd(pName + '.' + INIT_CMD_NAME,
-                       getCommandDelegate(this, &UIComponent::initComponent),
-                       false),
-    mExitComponent_cmd(pName + '.' + EXIT_CMD_NAME,
-                       getCommandDelegate(this, &UIComponent::exitComponent),
-                       false),
+                                const QString& pHelp_tip,
+                                bool pTrack):
     mName(pName),
     mFlag_Track(pTrack)
 {
 
-    mInitComponent_cmd.addHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
-    mExitComponent_cmd.addHelpTip(EXIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
+    mInitComponent_cmd
+            .setName(pName + '.' + INIT_CMD_NAME)
+            .link_to(this, &UIComponent::initComponent)
+            .setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip))
+            .addToUI(false);
+
+    mExitComponent_cmd
+            .setName(pName + '.' + EXIT_CMD_NAME)
+            .link_to(this, &UIComponent::exitComponent)
+            .setHelpTip(EXIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip))
+            .addToUI(false);
     mExitComponent_cmd.disable();
 
     if(mFlag_Track)
@@ -76,9 +76,9 @@ UIComponent<UIC_t>::~UIComponent()
 template<class UIC_t>
 void UIComponent<UIC_t>::initComponent()
 {
-    if(!p_component)
+    if(!mComponent_ptr)
     {
-        p_component = new UIC_t();
+        mComponent_ptr = new UIC_t();
     }
 
     mInitComponent_cmd.disable(INIT_CMD_DISABLE_REASON);
@@ -89,10 +89,10 @@ void UIComponent<UIC_t>::initComponent()
 template<class UIC_t>
 void UIComponent<UIC_t>::exitComponent()
 {
-    if(p_component)
+    if(mComponent_ptr)
     {
-        delete p_component;
-        p_component = nullptr;
+        delete mComponent_ptr;
+        mComponent_ptr = nullptr;
     }
 
     mInitComponent_cmd.enable();

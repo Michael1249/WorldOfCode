@@ -21,4 +21,5 @@ private:
     QProcess* mServer_Process;
 };
 
+
 #endif // UIC_SERVER_H

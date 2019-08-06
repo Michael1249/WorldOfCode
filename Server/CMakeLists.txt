@@ -1,20 +1,20 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(Server VERSION 0.1 LANGUAGES CXX)
+project(Server)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-add_subdirectory(GameTemplate)
-add_subdirectory(ServerUIComponent)
+add_subdirectory(GameCore)
 
 set(SOURCES
-    main.cpp
     Server.cpp
     )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${SUPPORT_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${USERINTERFACE_DIR})
+
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Support)
+target_link_libraries(${PROJECT_NAME} UserInterface)

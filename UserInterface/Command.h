@@ -1,6 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <type_traits>
 #include <memory>
 #include <QObject>
 #include <QVector>

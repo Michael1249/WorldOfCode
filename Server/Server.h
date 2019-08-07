@@ -1,27 +1,36 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QObject>
-#include "GameTemplate/GameTemplate.h"
+#include <QCoreApplication>
+#include <QDir>
+#include <QProcess>
+#include "Command.h"
 
-namespace ServerSide
+class Server
 {
-
-class Server : public QObject
-{
-    Q_OBJECT
-
 public:
-    Server() = default;
+    Server();
+    ~Server();
 
-    void start();
+    void lounch_game(const QString& pGame_name);
+    void close_game();
+
+    void print(const QString& pStr);
+    QString readStd();
+    QString readErr();
+
+    QProcess::ProcessState getState();
+
+signals:
+    void readyReadStd();
+    void readyReadErr();
 
 private:
-    void send_responce();
+    QStringList getExistingGames();
 
-    GameTemplate* mGame;
+    QProcess* mGame_procces;
+    QDir mGames_dir;
 };
 
-} // ServerSide
 
 #endif // SERVER_H

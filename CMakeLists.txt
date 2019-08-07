@@ -15,6 +15,7 @@ get_filename_component(SUPPORT_DIR Support ABSOLUTE)
 get_filename_component(USERINTERFACE_DIR UserInterface ABSOLUTE)
 
 add_subdirectory(Support)
+add_subdirectory(Games)
 add_subdirectory(Client)
 add_subdirectory(Server)
 add_subdirectory(UserInterface)
@@ -25,6 +26,6 @@ add_executable(${PROJECT_NAME} "main.cpp")
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     UserInterface
-    ServerUIComponent
+    Server
     )
 

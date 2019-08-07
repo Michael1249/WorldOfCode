@@ -16,14 +16,14 @@ public:
     void close_game();
 
     void print(const QString& pStr);
-    QString read();
-    QString read_err();
+    QString readStd();
+    QString readErr();
 
     QProcess::ProcessState getState();
 
-public slots:
-    void readyToReadStdOutput();
-    void readyToReadErrOutput();
+signals:
+    void readyReadStd();
+    void readyReadErr();
 
 private:
     QStringList getExistingGames();

@@ -1,21 +1,32 @@
-#include "qiostream.h"
+#include <QFileInfo>
+#include <QDir>
 #include "Server.h"
+#include "qiostream.h"
+#include "qexceptionmessage.h"
 
-namespace ServerSide
+Server::Server():
+      mGames_dir(QDir(QCoreApplication::applicationDirPath() + "/Games"))
 {
-
-void Server::start()
-{
-    //init code
-    send_responce();
 }
 
-void Server::send_responce()
+Server::~Server()
 {
-    //Server start verification
-    QString input;
-    qio::qin >> input;
-    qio::qout << input << endl;
 }
 
-} // ServerSide
+
+QStringList Server::getExistingGames()
+{
+    QStringList result = mGames_dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+
+    QMutableListIterator<QString> i(result);
+
+    while (i.hasNext())
+    {
+        auto& current_folder = i.next();
+        if (!QFileInfo::exists(mGames_dir.path() + '/' + current_folder + '/' + current_folder + ".exe"))
+            i.remove();
+    }
+
+    return result;
+}
+

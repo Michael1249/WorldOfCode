@@ -60,30 +60,6 @@ Server::~Server()
     //    delete mServer_Process;
 }
 
-void Server::showExistingGames()
-{
-    for (auto& game_name  : getExistingGames())
-    {
-        qio::qout << game_name << endl;
-    }
-}
-
-void Server::lounch(const QString &pGame_name)
-{
-    QString game_path = mGames_dir.path() + '/' + pGame_name + '/' + pGame_name + ".exe";
-
-    if (QFileInfo::exists(game_path))
-    {
-        mGame_procces = new QProcess();
-        mGame_procces->start(game_path);
-        qio::qout << "Game started!" << endl;
-    }
-    else
-    {
-        qio::qout << QString("Can not find game with name \"%1\"!").arg(pGame_name) << endl;
-    }
-
-}
 
 QStringList Server::getExistingGames()
 {

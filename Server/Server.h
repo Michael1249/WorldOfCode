@@ -12,20 +12,21 @@ public:
     Server();
     ~Server();
 
-    void showExistingGames();
-    void lounch(const QString& pGame_name);
-    void print(const QString& pStr);
-    void getStatus();
-    void showStatus();
+    void lounch_game(const QString& pGame_name);
     void close_game();
 
-private slots:
-    void game_responce();
+    void print(const QString& pStr);
+    QString read();
+    QString read_err();
+
+    QProcess::ProcessState getState();
+
+public slots:
+    void readyToReadStdOutput();
+    void readyToReadErrOutput();
 
 private:
     QStringList getExistingGames();
-
-    UI::Command mShowExistingGames_cmd;
 
     QProcess* mGame_procces;
     QDir mGames_dir;

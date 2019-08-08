@@ -5,25 +5,25 @@ QTextStream qio::qout(stdout);
 
 namespace qio
 {
-    QTextStream& info(QTextStream& stream)
+    QTextStream& green(QTextStream& stream)
     {
         stream << "\033[32m";
         return stream;
     } // green
 
-    QTextStream& warning(QTextStream& stream)
+    QTextStream& yellow(QTextStream& stream)
     {
         stream << "\033[93m";
         return stream;
     }//yellow
 
-    QTextStream& error(QTextStream& stream)
+    QTextStream& orange(QTextStream& stream)
     {
         stream << "\033[33m";
         return stream;
     }//orange
 
-    QTextStream& fatal(QTextStream& stream)
+    QTextStream& red(QTextStream& stream)
     {
         stream << "\033[31m";
         return stream;
@@ -34,5 +34,14 @@ namespace qio
         stream << "\033[0m\r\n";
         stream.flush();
         return stream;
-    } // Endl for color line
+    }
+
+    QTextStream &endc(QTextStream &stream)
+    {
+        stream << "\033[0m";
+        return stream;
+    }
+
+
+    // Endl for color line
 }

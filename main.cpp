@@ -7,13 +7,11 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    qio::qout << qio::info << "Info" << qio::cendl;
-    qio::qout << qio::warning << "Warning" << qio::cendl;
-    qio::qout << qio::error << "Error" << qio::cendl;
-    qio::qout << qio::fatal << "Fatal" << qio::cendl;
+    qio::info << "Learn, you never die! But you always can try." << qio::messend;
+
 
 //    setUpUI();
 //    UI::Run();
 
-    return a.exec();
+       return a.exec();
 }

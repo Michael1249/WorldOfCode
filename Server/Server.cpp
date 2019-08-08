@@ -9,11 +9,6 @@ Server::Server():
 {
 }
 
-Server::~Server()
-{
-}
-
-
 QStringList Server::getExistingGames()
 {
     QStringList result = mGames_dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
@@ -29,4 +24,15 @@ QStringList Server::getExistingGames()
 
     return result;
 }
+
+void Server::launch_game(const QString &pGame_name)
+{
+
+}
+
+Server::~Server()
+{
+}
+
+
 

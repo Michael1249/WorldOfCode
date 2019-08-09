@@ -10,53 +10,23 @@ namespace UI
 
 Command::~Command()
 {
-    Interface::getInstance().removeCommand(*this);
-    if(mFlag_track)
-    {
-        qio::qout << CMD_EXIT_MSG << mInfo.getName() << endl;
-    }
+    Interface::getInstance().removeCommand(pName);
 }
 
-Command &Command::setName(const QString &pName)
+void Command::addToUI(const CommandInfo& pInfo)
 {
-    mInfo.setName(pName);
-    return *this;
+    Interface::getInstance().addCommand(*this, pInfo);
 }
 
-Command& Command::addArg(const ArgInfo& pArg)
-{
-    mInfo.setArg(pArg);
-    return *this;
-}
-
-Command& Command::setHelpTip(const QString& pHelp_tip)
-{
-    mInfo.setHelpTip(pHelp_tip);
-    return *this;
-}
-
-void Command::addToUI(bool pTrack)
-{
-    Interface::getInstance().addCommand(*this);
-
-    mFlag_track = pTrack;
-    if(mFlag_track)
-    {
-        qio::qout << CMD_INIT_MSG << mInfo.getName() << endl;
-    }
-}
-
-void Command::exec_slot(const QString& pArgs) const
+void Command::exec_slot(const QVector<QString>& pArg_vals) const
 {
 
     if(mIs_enable)
     {
-        QStringList arg_list = splitArgsLine(pArgs);
 
         try
         {
-            QVector<QString> val_list = parseArgLine(arg_list);
-            mDelegate.get()->Invoke(val_list);
+            mDelegate.get()->Invoke(pArg_vals);
         }
         catch (QExceptionMessage& e)
         {
@@ -99,13 +69,8 @@ bool Command::isEnable() const
     return mIs_enable;
 }
 
-const CommandInfo &Command::getInfo() const
-{
-    return mInfo;
-}
-
 // NOT MY CODE
-QStringList Command::splitArgsLine(const QString& pArgs_str)
+QStringList CommandRepresent::splitArgsLine(const QString& pArgs_str)
 {
     QStringList list;
     QString arg;
@@ -150,7 +115,7 @@ QString removeBrackets(const QString& pStr)
     return result;
 }
 
-QVector<QString> Command::parseArgLine(const QStringList &args_list) const
+QVector<QString> CommandRepresent::parseArgsList(const QStringList &args_list) const
 {
     QVector<QString> values;
     QVector<bool> setted_values;
@@ -233,7 +198,7 @@ void CommandInfo::setName(const QString &pNaame)
     mName = pNaame;
 }
 
-void CommandInfo::setArg(const ArgInfo &pArg)
+void CommandInfo::addArg(const ArgInfo &pArg)
 {
     mArguments.append(pArg);
 }
@@ -263,6 +228,16 @@ bool CommandInfo::hasHelpTip() const
     return mHelp_tip.size();
 }
 
+bool CommandInfo::getFlagTrack() const
+{
+    return mFlag_track;
+}
+
+void CommandInfo::setFlagTrack(bool flag_track)
+{
+    mFlag_track = flag_track;
+}
+
 CommandRepresent::CommandRepresent(const CommandInfo &pInfo):
     mInfo(pInfo)
 {
@@ -276,6 +251,24 @@ const CommandInfo &CommandRepresent::getInfo() const
 void CommandRepresent::setInfo(const CommandInfo& pInfo)
 {
     mInfo = pInfo;
+}
+
+void CommandRepresent::callCommand(const QString& pArgs)
+{
+    try
+    {
+        auto args_list = splitArgsLine(pArgs);
+        auto arg_vals = parseArgsList(args_list);
+        exec(arg_vals);
+    }
+    catch (QExceptionMessage& e)
+    {
+        qio::qout << "[ERROR]: " << e.getMessage() << endl;
+    }
+    catch (std::exception& e)
+    {
+        qio::qout << "[ERROR]: " << e.what() << endl;
+    }
 }
 
 } // UI

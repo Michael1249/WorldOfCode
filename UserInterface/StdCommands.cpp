@@ -8,11 +8,10 @@ namespace UI
 
 StdCommands::StdCommands()
 {
-    mHelp_request_cmd
-        .setName("help")
-        .link_to(this, &StdCommands::help_request)
-        .setHelpTip("helps to find command and get discription")
-        .addArg(
+    CommandInfo info;
+    info.setName("help");
+    info.setHelpTip("helps to find command and get discription");
+    info.addArg(
             ArgInfo
             {
                 .name="filter",
@@ -20,7 +19,8 @@ StdCommands::StdCommands()
                 .help_tip = "search for commands which contain <filter>,\n"
                             "show command's details if it's found."
             }
-        ).addToUI(false);
+        );
+    mHelp_request_cmd.addToUI(info);
 }
 
 void StdCommands::help_request(const QString &pStr)

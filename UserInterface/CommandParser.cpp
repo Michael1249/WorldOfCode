@@ -6,25 +6,25 @@
 namespace UI
 {
 
-void CommandParser::addCommand(const Command &pCommand)
+void CommandParser::addCommand(const Command &pCommand, const CommandInfo& pInfo)
 {
 
-    if (mCommands.find(pCommand.getInfo().getName()) != mCommands.end())
+    if (mCommands.find(pInfo.getName()) != mCommands.end())
     {
-        throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pCommand.getInfo().getName()));
+        throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pInfo.getName()));
     }
 
-    auto signal = mCommands.insert(
-                pCommand.getInfo().getName(),
-                QPointer<CommandRepresent>(new CommandRepresent(pCommand.getInfo()))
+    auto command_rep = mCommands.insert(
+                pInfo.getName(),
+                QPointer<CommandRepresent>(new CommandRepresent(pInfo))
     ).value().data();
 
-    QObject::connect(signal, SIGNAL(exec(const QString&)), &pCommand, SLOT(exec_slot(const QString&)));
+    QObject::connect(command_rep, SIGNAL(exec(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
 }
 
-void CommandParser::removeCommand(const Command &pCommand)
+void CommandParser::removeCommand(const QString &pCommand_name)
 {
-    mCommands.remove(pCommand.getInfo().getName());
+    mCommands.remove(pCommand_name);
 }
 
 void CommandParser::parseString(const QString& pCommand_str)
@@ -39,7 +39,7 @@ void CommandParser::parseString(const QString& pCommand_str)
 
         if (command_iter != mCommands.end())
         {
-            command_iter.value()->exec(command_args);
+            command_iter.value()->callCommand(pCommand_str);
         }
         else
         {

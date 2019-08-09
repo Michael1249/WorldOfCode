@@ -18,8 +18,8 @@ public:
 
     CommandParser() = default;
 
-    void addCommand(const Command& pCommand);
-    void removeCommand(const Command& pCommand);
+    void addCommand(const Command& pCommand, const CommandInfo& pInfo);
+    void removeCommand(const QString &pCommand_name);
     void parseString(const QString& pCommand_str);
 
     const command_map& getCommands() const;

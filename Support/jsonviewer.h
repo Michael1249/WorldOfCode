@@ -6,14 +6,24 @@
 #include <qiostream.h>
 
 
-class JsonViewer : QObject
+class JsonViewer : public QObject
 {
     Q_OBJECT
 public:
     JsonViewer();
-private slots:
+public slots:
     void readDoc(const QJsonObject obj);
-
 };
+
+class A : public QObject
+{
+    Q_OBJECT
+public:
+    void send();
+signals:
+    void data(QJsonObject jv);
+};
+
+
 
 #endif // JSONVIEWER_H

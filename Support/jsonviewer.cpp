@@ -20,7 +20,7 @@ void JsonViewer::readDoc(const QJsonObject obj)
 void A::send()
 {
     QJsonObject obj;
-    obj["type"] = "info";
+    obj["type"] = "warning";
     obj["data"] = "Vlad is cool";
 
     emit data(obj);

@@ -8,20 +8,20 @@ JsonViewer::JsonViewer()
 void JsonViewer::readDoc(const QJsonObject obj)
 {
     if(obj["type"].toString() == "info")
-        qio::info << obj["data"].toString() << endl;
+        qio::info << obj["data"].toString() << qio::messend;
     else if(obj["type"].toString() == "warning")
-        qio::warning << obj["data"].toString() << endl;
+        qio::warning << obj["data"].toString() << qio::messend;
     else if(obj["type"].toString() == "fatal")
-        qio::fatal << obj["data"].toString() << endl;
+        qio::fatal << obj["data"].toString() << qio::messend;
     else
-        qio::error << obj["data"].toString() << endl;
+        qio::error << obj["data"].toString() << qio::messend;
 }
 
-void A::send()
+void A::send(QString type, QString data)
 {
     QJsonObject obj;
-    obj["type"] = "warning";
-    obj["data"] = "Vlad is cool";
+    obj["type"] = type;
+    obj["data"] = data;
 
-    emit data(obj);
+    emit signalData(obj);
 }

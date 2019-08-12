@@ -15,9 +15,12 @@ int main(int argc, char *argv[])
     JsonViewer jv;
     A aa;
 
-    QObject::connect(&aa, SIGNAL(data(QJsonObject)), &jv, SLOT(readDoc(QJsonObject)));
+    QObject::connect(&aa, SIGNAL(signalData(QJsonObject)), &jv, SLOT(readDoc(QJsonObject)));
 
-    aa.send();
+    aa.send("info", "data");
+    aa.send("warning", "data");
+    aa.send("error", "data");
+    aa.send("fatal", "data");
 
 //    setUpUI();
 //    UI::Run();

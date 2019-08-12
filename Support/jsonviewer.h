@@ -19,9 +19,9 @@ class A : public QObject
 {
     Q_OBJECT
 public:
-    void send();
+    void send(QString type, QString data);
 signals:
-    void data(QJsonObject jv);
+    void signalData(QJsonObject jv);
 };
 
 

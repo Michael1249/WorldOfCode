@@ -45,11 +45,13 @@ UIComponent<UIC_t>::UIComponent(const QString& pName,
     CommandInfo init_cmd_info;
     init_cmd_info.setName(pName + '.' + INIT_CMD_NAME);
     init_cmd_info.setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
+    mInitComponent_cmd.link_to(this, &UIComponent<UIC_t>::initComponent);
     mInitComponent_cmd.addToUI(init_cmd_info);
 
     CommandInfo exit_cmd_info;
     exit_cmd_info.setName(pName + '.' + EXIT_CMD_NAME);
     exit_cmd_info.setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
+    mInitComponent_cmd.link_to(this, &UIComponent<UIC_t>::exitComponent);
     mExitComponent_cmd.addToUI(exit_cmd_info);
     mExitComponent_cmd.disable();
 

@@ -20,6 +20,7 @@ StdCommands::StdCommands()
                             "show command's details if it's found."
             }
         );
+    mHelp_request_cmd.link_to(this, &StdCommands::help_request);
     mHelp_request_cmd.addToUI(info);
 }
 

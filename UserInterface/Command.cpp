@@ -20,7 +20,6 @@ void Command::addToUI(const CommandInfo& pInfo)
 
 void Command::exec_slot(const QVector<QString>& pArg_vals) const
 {
-
     if(mIs_enable)
     {
 
@@ -259,7 +258,7 @@ void CommandRepresent::callCommand(const QString& pArgs)
     {
         auto args_list = splitArgsLine(pArgs);
         auto arg_vals = parseArgsList(args_list);
-        exec(arg_vals);
+        emit call_signal(arg_vals);
     }
     catch (QExceptionMessage& e)
     {

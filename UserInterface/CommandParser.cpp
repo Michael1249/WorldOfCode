@@ -19,7 +19,7 @@ void CommandParser::addCommand(const Command &pCommand, const CommandInfo& pInfo
                 QPointer<CommandRepresent>(new CommandRepresent(pInfo))
     ).value().data();
 
-    QObject::connect(command_rep, SIGNAL(exec(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
+    QObject::connect(command_rep, SIGNAL(call_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
 }
 
 void CommandParser::removeCommand(const QString &pCommand_name)
@@ -39,7 +39,7 @@ void CommandParser::parseString(const QString& pCommand_str)
 
         if (command_iter != mCommands.end())
         {
-            command_iter.value()->callCommand(pCommand_str);
+            command_iter.value()->callCommand(command_args);
         }
         else
         {

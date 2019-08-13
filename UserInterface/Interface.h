@@ -38,8 +38,8 @@ private:
     // only Command can add/remove itself to Interface
     friend class Command;
 
-    void addCommand(const Command& pCommand);
-    void removeCommand(const Command& pCommand);
+    void addCommand(const Command& pCommand, const CommandInfo& pInfo);
+    void removeCommand(const QString &pCommand_name);
 
     CommandParser mParser;
     bool mFlag_run_end = false;

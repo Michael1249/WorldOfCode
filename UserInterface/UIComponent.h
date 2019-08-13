@@ -42,17 +42,17 @@ UIComponent<UIC_t>::UIComponent(const QString& pName,
     mFlag_Track(pTrack)
 {
 
-    mInitComponent_cmd
-            .setName(pName + '.' + INIT_CMD_NAME)
-            .link_to(this, &UIComponent::initComponent)
-            .setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip))
-            .addToUI(false);
+    CommandInfo init_cmd_info;
+    init_cmd_info.setName(pName + '.' + INIT_CMD_NAME);
+    init_cmd_info.setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
+    mInitComponent_cmd.link_to(this, &UIComponent<UIC_t>::initComponent);
+    mInitComponent_cmd.addToUI(init_cmd_info);
 
-    mExitComponent_cmd
-            .setName(pName + '.' + EXIT_CMD_NAME)
-            .link_to(this, &UIComponent::exitComponent)
-            .setHelpTip(EXIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip))
-            .addToUI(false);
+    CommandInfo exit_cmd_info;
+    exit_cmd_info.setName(pName + '.' + EXIT_CMD_NAME);
+    exit_cmd_info.setHelpTip(INIT_CMD_HELP_TIP.arg(pName).arg(pHelp_tip));
+    mInitComponent_cmd.link_to(this, &UIComponent<UIC_t>::exitComponent);
+    mExitComponent_cmd.addToUI(exit_cmd_info);
     mExitComponent_cmd.disable();
 
     if(mFlag_Track)

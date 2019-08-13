@@ -13,14 +13,14 @@ void Run()
     Interface::getInstance().run();
 }
 
-void Interface::addCommand(const Command &pCommand)
+void Interface::addCommand(const Command& pCommand, const CommandInfo& pInfo)
 {
-    mParser.addCommand(pCommand);
+    mParser.addCommand(pCommand,pInfo);
 }
 
-void Interface::removeCommand(const Command &pCommand)
+void Interface::removeCommand(const QString &pCommand_name)
 {
-    mParser.removeCommand(pCommand);
+    mParser.removeCommand(pCommand_name);
 }
 
 Interface& Interface::getInstance()

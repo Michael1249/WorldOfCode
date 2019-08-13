@@ -54,7 +54,7 @@ public:
     void callCommand(const QString&);
 
 signals:
-    void exec(const QVector<QString>&);
+    void call_signal(const QVector<QString>&);
 
 private:
     static QStringList splitArgsLine(const QString & pArgs_str);

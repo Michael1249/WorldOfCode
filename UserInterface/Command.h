@@ -24,18 +24,22 @@ class CommandInfo
 public:
 
     void setName(const QString& pNaame);
-    void setArg(const ArgInfo& pArg);
+    void addArg(const ArgInfo& pArg);
     void setHelpTip(const QString& pHelp_tip);
+    void setFlagTrack(bool flag_track);
 
     const QString& getName() const;
     const QString& getHelpTip() const;
     const QList<ArgInfo>& getArgumentsInfo() const;
+    bool getFlagTrack() const;
     bool hasHelpTip() const;
 
 private:
     QString mName;
     QString mHelp_tip;
     QList<ArgInfo> mArguments;
+    //if true, track creation and destruction and output to console
+    bool mFlag_track;
 };
 
 class CommandRepresent:public QObject
@@ -47,10 +51,15 @@ public:
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
 
+    void callCommand(const QString&);
+
 signals:
-    void exec(const QString&);
+    void call_signal(const QVector<QString>&);
 
 private:
+    static QStringList splitArgsLine(const QString & pArgs_str);
+    QVector<QString> parseArgsList(const QStringList& args_list) const;
+
     CommandInfo mInfo;
 };
 
@@ -71,35 +80,24 @@ public:
     Command() = default;
     ~Command();
 
-    Command& setName(const QString& pName);
-    Command& addArg(const ArgInfo& pArg);
-    Command& setHelpTip(const QString& pHelp_tip);
     template<class Obj_t, class MFunc_t>
     Command& link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
-    void addToUI(bool pTrack = true);
+    void addToUI(const CommandInfo& pInfo);
 
     void enable();
     void disable(const QString& pReason = "");
     bool isEnable() const;
 
-    const CommandInfo& getInfo() const;
-
 private slots:
-    void exec_slot(const QString& pArgs) const;
+    void exec_slot(const QVector<QString>& pArg_vals) const;
 
 private:
 
-    static QStringList splitArgsLine(const QString & pArgs_str);
-    QVector<QString> parseArgLine(const QStringList& args_list) const;
-
-    CommandInfo mInfo;
+    QString pName;
     std::unique_ptr<ICommandDelegate> mDelegate;
 
     bool mIs_enable = true;
     QString mDisable_reason;
-
-    //if true, track creation and destruction and output to console
-    bool mFlag_track;
 };
 
 template<class Obj_t, class MFunc_t>

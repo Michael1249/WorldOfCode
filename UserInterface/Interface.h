@@ -3,6 +3,7 @@
 
 #include "CommandParser.h"
 #include "UIComponent.h"
+#include "Interface_source.h"
 
 namespace UI
 {
@@ -22,13 +23,20 @@ void addStaticUIComponent(QString pName, QString pHelp_tip = "")
 }
 
 // Singleton
-class Interface
+class Interface : public QObject
 {
+    Q_OBJECT
+
 public:
 
     static Interface& getInstance();
     void run();
     const CommandParser& getParser();
+
+public slots:
+    void addCommand_slot();
+    void rmCommand_slot();
+
 
 private:
 

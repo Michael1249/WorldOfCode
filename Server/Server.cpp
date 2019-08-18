@@ -7,6 +7,7 @@
 Server::Server():
       mGames_dir(QDir(QCoreApplication::applicationDirPath() + "/Games"))
 {
+
 }
 
 QStringList Server::getExistingGames()
@@ -27,24 +28,38 @@ QStringList Server::getExistingGames()
 
 void Server::launch_game(const QString &pGame_name)
 {
-    mGame_procces->start("../Games/" + pGame_name);
-    if(!mGame_procces->waitForStarted())
+    mGame_process->start("../Games/" + pGame_name);
+    if(!mGame_process->waitForStarted())
         qio::qout << "Server can not start game " << pGame_name << endl;
+
+    QObject::connect(mGame_process, SIGNAL(readyReadStandardOutput(QPrivateSignal)), this, SIGNAL(readyReadStd()), Qt::QueuedConnection);
+    QObject::connect(mGame_process, SIGNAL(readyReadStandardError(QPrivateSignal)), this, SIGNAL(readyReadErr()), Qt::QueuedConnection);
 }
 
 void Server::print(const QString &pStr)
 {
-    mGame_procces->write(pStr.toUtf8());
+    mGame_process->write(pStr.toUtf8());
 }
 
 QString Server::readStd()
 {
-    return mGame_procces->readAllStandardOutput();
+    return mGame_process->readAllStandardOutput();
+}
+
+QString Server::readErr()
+{
+    return mGame_process->readAllStandardError();
+}
+
+QProcess::ProcessState Server::getState()
+{
+    return mGame_process->state();
+
 }
 
 void Server::close_game()
 {
-    mGame_procces->terminate();
+    mGame_process->terminate();
 }
 
 Server::~Server()

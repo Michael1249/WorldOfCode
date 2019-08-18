@@ -27,7 +27,24 @@ QStringList Server::getExistingGames()
 
 void Server::launch_game(const QString &pGame_name)
 {
+    mGame_procces->start("../Games/" + pGame_name);
+    if(!mGame_procces->waitForStarted())
+        qio::qout << "Server can not start game " << pGame_name << endl;
+}
 
+void Server::print(const QString &pStr)
+{
+    mGame_procces->write(pStr.toUtf8());
+}
+
+QString Server::readStd()
+{
+    return mGame_procces->readAllStandardOutput();
+}
+
+void Server::close_game()
+{
+    mGame_procces->terminate();
 }
 
 Server::~Server()

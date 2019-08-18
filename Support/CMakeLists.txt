@@ -11,6 +11,7 @@ set(SOURCES
     table.cpp
     tebleraw.cpp
     qexceptionmessage.cpp
+    jsonviewer.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

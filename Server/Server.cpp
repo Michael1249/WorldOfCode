@@ -28,12 +28,18 @@ QStringList Server::getExistingGames()
 
 void Server::launch_game(const QString &pGame_name)
 {
-    mGame_process->start("../Games/" + pGame_name);
-    if(!mGame_process->waitForStarted())
-        qio::qout << "Server can not start game " << pGame_name << endl;
+    QString pathToGame = mGames_dir.path() + '/' + pGame_name + '/' + pGame_name + ".exe";
+    if(QFileInfo::exists(pathToGame))
+    {
+        mGame_process->start(pathToGame);
+        if(!mGame_process->waitForStarted())
+            qio::qout << "Server can not start game." << pGame_name << endl;
 
-    QObject::connect(mGame_process, SIGNAL(readyReadStandardOutput(QPrivateSignal)), this, SIGNAL(readyReadStd()), Qt::QueuedConnection);
-    QObject::connect(mGame_process, SIGNAL(readyReadStandardError(QPrivateSignal)), this, SIGNAL(readyReadErr()), Qt::QueuedConnection);
+        QObject::connect(mGame_process, SIGNAL(readyReadStandardOutput(QPrivateSignal)), this, SIGNAL(readyReadStd()), Qt::QueuedConnection);
+        QObject::connect(mGame_process, SIGNAL(readyReadStandardError(QPrivateSignal)), this, SIGNAL(readyReadErr()), Qt::QueuedConnection);
+    }
+    else qio::qout << "Game " << pGame_name << " is not exist." << endl;
+
 }
 
 void Server::print(const QString &pStr)
@@ -60,10 +66,13 @@ QProcess::ProcessState Server::getState()
 void Server::close_game()
 {
     mGame_process->terminate();
+
+    if(mGame_process->state() == QProcess::Running) mGame_process->close();
 }
 
 Server::~Server()
 {
+    close_game();
 }
 
 

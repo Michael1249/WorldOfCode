@@ -6,8 +6,9 @@
 #include <QProcess>
 #include "Command.h"
 
-class Server
+class Server : QObject
 {
+    Q_OBJECT
 public:
     Server();
     ~Server();
@@ -28,7 +29,7 @@ signals:
 private:
     QStringList getExistingGames();
 
-    QProcess* mGame_procces;
+    QProcess* mGame_process;
     QDir mGames_dir;
 };
 

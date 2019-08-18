@@ -67,7 +67,7 @@ void Server::close_game()
 {
     mGame_process->terminate();
 
-    if(mGame_process->state() == QProcess::Running) mGame_process->close();
+    if(!mGame_process->waitForFinished()) mGame_process->close();
 }
 
 Server::~Server()

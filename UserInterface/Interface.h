@@ -22,26 +22,23 @@ void addStaticUIComponent(QString pName, QString pHelp_tip = "")
     static UI::UIComponent<Pack_t> component(pName, pHelp_tip, false);
 }
 
-// Singleton
-class Interface : public QObject
+class Interface : public InterfaceSimpleSource
 {
     Q_OBJECT
 
 public:
 
+    Interface(QObject *parent = nullptr);
+    ~Interface() = default;
     static Interface& getInstance();
     void run();
     const CommandParser& getParser();
 
-public slots:
-    void addCommand_slot();
-    void rmCommand_slot();
+    virtual void addCommand_slot(QString pURL);
+    virtual void rmCommand_slot(QString pURL);
 
 
 private:
-
-    Q_DISABLE_COPY_MOVE(Interface)
-    Interface() = default;
 
     // only Command can add/remove itself to Interface
     friend class Command;

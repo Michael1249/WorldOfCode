@@ -10,6 +10,10 @@ namespace UI
 void Run()
 {
     static StdCommands std_commands;
+
+    QRemoteObjectHost srcNode(QUrl(QStringLiteral("local:interface"))); // create host node without Registry
+    srcNode.enableRemoting(&Interface::getInstance()); // enable remoting/sharing
+
     Interface::getInstance().run();
 }
 
@@ -21,6 +25,10 @@ void Interface::addCommand(const Command& pCommand, const CommandInfo& pInfo)
 void Interface::removeCommand(const QString &pCommand_name)
 {
     mParser.removeCommand(pCommand_name);
+}
+
+Interface::Interface(QObject *parent): InterfaceSimpleSource (parent)
+{
 }
 
 Interface& Interface::getInstance()
@@ -47,6 +55,16 @@ void Interface::run()
 const CommandParser &Interface::getParser()
 {
     return mParser;
+}
+
+void Interface::addCommand_slot(QString pURL)
+{
+    qio::qout << "+" + pURL;
+}
+
+void Interface::rmCommand_slot(QString pURL)
+{
+    qio::qout << "-" + pURL;
 }
 
 } // UI

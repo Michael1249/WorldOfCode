@@ -12,8 +12,6 @@ set(SOURCES
     Interface_source.h
     CommandParser.cpp
     Command.cpp
-    StdCommands.cpp
-    UITest.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

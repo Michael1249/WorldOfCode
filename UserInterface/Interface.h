@@ -1,51 +1,39 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+#include <QCoreApplication>
 #include "CommandParser.h"
-#include "UIComponent.h"
 #include "Interface_source.h"
 
 namespace UI
 {
-
-void Run();
-
-template <class Pack_t>
-void addStaticCmdPack()
-{
-    static Pack_t pack;
-}
-
-template <class Pack_t>
-void addStaticUIComponent(QString pName, QString pHelp_tip = "")
-{
-    static UI::UIComponent<Pack_t> component(pName, pHelp_tip, false);
-}
 
 class Interface : public InterfaceSimpleSource
 {
     Q_OBJECT
 
 public:
-
-    Interface(QObject *parent = nullptr);
+    Interface(QCoreApplication *parent = nullptr);
     ~Interface() = default;
-    static Interface& getInstance();
-    void run();
-    const CommandParser& getParser();
 
+public slots:
     virtual void addCommand_slot(QString pURL);
     virtual void rmCommand_slot(QString pURL);
+    void run();
 
+signals:
+    void finished();
 
 private:
+    void help_request(const QString& pStr);
+    Command mHelp_request_cmd;
 
-    // only Command can add/remove itself to Interface
     friend class Command;
 
     void addCommand(const Command& pCommand, const CommandInfo& pInfo);
     void removeCommand(const QString &pCommand_name);
 
+    QRemoteObjectHost mRemote_node;
     CommandParser mParser;
     bool mFlag_run_end = false;
 

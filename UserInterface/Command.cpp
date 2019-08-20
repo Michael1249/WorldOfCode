@@ -10,12 +10,12 @@ namespace UI
 
 Command::~Command()
 {
-    Interface::getInstance().removeCommand(pName);
+    //Interface::getInstance().removeCommand(pName);
 }
 
 void Command::addToUI(const CommandInfo& pInfo)
 {
-    Interface::getInstance().addCommand(*this, pInfo);
+   // Interface::getInstance().addCommand(*this, pInfo);
 }
 
 void Command::exec_slot(const QVector<QString>& pArg_vals) const

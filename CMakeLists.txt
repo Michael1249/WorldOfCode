@@ -11,6 +11,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt5Core REQUIRED)
 
+find_program(REPC_EXE repc REQUIRED)
+if(NOT REPC_EXE)
+    message(FATAL_ERROR "REPC not found!")
+endif()
+
+
 get_filename_component(SUPPORT_DIR Support ABSOLUTE)
 get_filename_component(USERINTERFACE_DIR UserInterface ABSOLUTE)
 

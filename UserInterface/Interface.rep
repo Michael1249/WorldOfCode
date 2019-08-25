@@ -1,0 +1,5 @@
+class Interface
+{
+    SLOT(addCommand_slot(QString pURL));
+    SLOT(rmCommand_slot(QString pURL));
+};

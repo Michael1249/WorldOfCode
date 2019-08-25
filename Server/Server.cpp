@@ -3,6 +3,7 @@
 #include "Server.h"
 #include "qiostream.h"
 #include "qexceptionmessage.h"
+#include "Interface_replica.h"
 
 Server::Server():
       mGames_dir(QDir(QCoreApplication::applicationDirPath() + "/Games"))

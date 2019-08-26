@@ -1,0 +1,5 @@
+class CommandRepresent
+{
+    SIGNAL(exec_signal(const QVector<QString>& pArg_vals));
+    SLOT(commandDestroyed_slot());
+};

@@ -1,5 +1,6 @@
 class Interface
 {
-    SLOT(addCommand_slot(QString pURL));
-    SLOT(rmCommand_slot(QString pURL));
+    SLOT(addRemoteCommand_slot(const QByteArray& pInfo));
+    SLOT(removeCommand_slot(const QString& pName));
+    SLOT(test());
 };

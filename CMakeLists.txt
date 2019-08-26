@@ -25,6 +25,7 @@ add_subdirectory(Games)
 add_subdirectory(Client)
 add_subdirectory(Server)
 add_subdirectory(UserInterface)
+add_subdirectory(UserInterface_Example)
 
 
 add_executable(${PROJECT_NAME} "main.cpp")

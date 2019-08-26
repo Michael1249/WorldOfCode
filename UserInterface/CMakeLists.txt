@@ -36,12 +36,44 @@ else()
     message("Start repc replica...DONE")
 endif()
 
+message(STATUS "Start repc source...")
+execute_process(COMMAND ${REPC_EXE} -i rep -o source
+                        "${PROJECT_SOURCE_DIR}\\CommandRepresent.rep" "${PROJECT_SOURCE_DIR}\\CommandRepresent_source.h"
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                RESULT_VARIABLE rep_result
+                ERROR_VARIABLE rep_error
+                OUTPUT_VARIABLE rep_ver)
+
+if(ret_result EQUAL "1")
+    message("Start repc source...FAIL")
+    message(rep_error)
+else()
+    message("Start repc source...DONE")
+endif()
+
+message(STATUS "Start repc source...")
+execute_process(COMMAND ${REPC_EXE} -i rep -o replica
+                        "${PROJECT_SOURCE_DIR}\\CommandRepresent.rep" "${PROJECT_SOURCE_DIR}\\CommandRepresent_replica.h"
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                RESULT_VARIABLE rep_result
+                ERROR_VARIABLE rep_error)
+
+if(ret_result EQUAL "1")
+    message("Start repc replica...FAIL")
+    message(rep_error)
+else()
+    message("Start repc replica...DONE")
+endif()
 
 set(SOURCES
-    Interface.cpp
+    LocalInterface.cpp
+    RemoteInterface.cpp
     Interface_source.h
-    CommandParser.cpp
+    Interface_replica.h
     Command.cpp
+    CommandRepresent_source.h
+    CommandRepresent_replica.h
+    CommandParser.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

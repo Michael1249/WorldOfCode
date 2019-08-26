@@ -6,10 +6,10 @@
 namespace UI
 {
 
-void CommandParser::addCommand(const Command &pCommand, const CommandInfo& pInfo)
+CommandRepresent* CommandParser::addCommand(const CommandInfo& pInfo)
 {
 
-    if (mCommands.find(pInfo.getName()) != mCommands.end())
+    if (mCommands.contains(pInfo.getName()))
     {
         throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pInfo.getName()));
     }
@@ -19,7 +19,8 @@ void CommandParser::addCommand(const Command &pCommand, const CommandInfo& pInfo
                 QPointer<CommandRepresent>(new CommandRepresent(pInfo))
     ).value().data();
 
-    QObject::connect(command_rep, SIGNAL(call_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
+    return command_rep;
+    //QObject::connect(command_rep, SIGNAL(call_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
 }
 
 void CommandParser::removeCommand(const QString &pCommand_name)

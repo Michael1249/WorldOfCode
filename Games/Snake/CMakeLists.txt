@@ -9,7 +9,6 @@ find_package(Qt5RemoteObjects)
 
 set(SOURCES
     main.cpp
-    Interface_replica.h
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

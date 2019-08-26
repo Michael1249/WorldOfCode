@@ -1,4 +1,7 @@
-#include "Interface.h"
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include "LocalInterface.h"
 #include "qiostream.h"
 #include "qexceptionmessage.h"
 #include "UIConstants.h"
@@ -10,38 +13,7 @@ namespace UI
 
 Command::~Command()
 {
-    //Interface::getInstance().removeCommand(pName);
-}
-
-void Command::addToUI(const CommandInfo& pInfo)
-{
-   // Interface::getInstance().addCommand(*this, pInfo);
-}
-
-void Command::exec_slot(const QVector<QString>& pArg_vals) const
-{
-    if(mIs_enable)
-    {
-
-        try
-        {
-            mDelegate.get()->Invoke(pArg_vals);
-        }
-        catch (QExceptionMessage& e)
-        {
-            qio::qout << "[ERROR]: " << e.getMessage() << endl;
-        }
-        catch (std::exception& e)
-        {
-            qio::qout << "[ERROR]: " << e.what() << endl;
-        }
-
-    }
-    else
-    {
-        qio::qout << mDisable_reason << endl;
-    }
-
+    emit destroyed();
 }
 
 void Command::enable()
@@ -66,6 +38,32 @@ void Command::disable(const QString& pReason)
 bool Command::isEnable() const
 {
     return mIs_enable;
+}
+
+void Command::exec_slot(const QVector<QString> &pArg_vals)
+{
+    if(mIs_enable)
+    {
+
+        try
+        {
+            mDelegate.get()->Invoke(pArg_vals);
+        }
+        catch (QExceptionMessage& e)
+        {
+            qio::qout << "[ERROR]: " << e.getMessage() << endl;
+        }
+        catch (std::exception& e)
+        {
+            qio::qout << "[ERROR]: " << e.what() << endl;
+        }
+
+    }
+    else
+    {
+        qio::qout << mDisable_reason << endl;
+    }
+
 }
 
 // NOT MY CODE
@@ -192,6 +190,35 @@ QVector<QString> CommandRepresent::parseArgsList(const QStringList &args_list) c
     return values;
 }
 
+void CommandRepresent::commandDestroyed_slot()
+{
+    emit destroyed(mInfo.getName());
+}
+
+CommandInfo::CommandInfo(const QByteArray &data)
+{
+    fromJson(data);
+}
+
+QJsonObject CommandInfo::toJson() const
+{
+    QJsonObject json;
+    json["name"] = mName;
+    json["help_tip"] = mHelp_tip;
+    json["arguments"] = argumentsToJson();
+    json["flag_track"] = mFlag_track;
+    return json;
+}
+
+void CommandInfo::fromJson(const QByteArray &data)
+{
+    QJsonObject json = QJsonDocument::fromJson(data).object();
+    mName = json["name"].toString();
+    mHelp_tip = json["help_tip"].toString();
+    argumentsFromJson(json["arguments"].toArray());
+    mFlag_track = json["flag_track"].toBool();
+}
+
 void CommandInfo::setName(const QString &pNaame)
 {
     mName = pNaame;
@@ -225,6 +252,21 @@ const QList<ArgInfo> &CommandInfo::getArgumentsInfo() const
 bool CommandInfo::hasHelpTip() const
 {
     return mHelp_tip.size();
+}
+
+QJsonArray CommandInfo::argumentsToJson() const
+{
+    QJsonArray array;
+       for (const auto& arg_info : mArguments)
+          array.append(arg_info.toJson());
+       return array;
+}
+
+void CommandInfo::argumentsFromJson(const QJsonArray &array)
+{
+    auto iter = array.begin();
+    for (auto& arg_info : mArguments)
+       arg_info.fromJson(iter->toObject());
 }
 
 bool CommandInfo::getFlagTrack() const
@@ -268,6 +310,24 @@ void CommandRepresent::callCommand(const QString& pArgs)
     {
         qio::qout << "[ERROR]: " << e.what() << endl;
     }
+}
+
+QJsonObject ArgInfo::toJson() const
+{
+    QJsonObject json;
+    json["name"] = name;
+    json["short_name"] = QString(short_name);
+    json["help_tip"] = help_tip;
+    json["default_value"] = default_value;
+    return json;
+}
+
+void ArgInfo::fromJson(const QJsonObject &data)
+{
+    name = data["name"].toString();
+    short_name = data["short_name"].toString()[0];
+    help_tip = data["help_tip"].toString();
+    default_value = data["default_value"].toString();
 }
 
 } // UI

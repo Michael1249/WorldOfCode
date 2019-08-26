@@ -6,12 +6,16 @@
 #include <QObject>
 #include <QVector>
 #include "CommandDelegate.h"
+#include "CommandRepresent_source.h"
 
 namespace UI
 {
 
 struct ArgInfo
 {
+    QJsonObject toJson() const;
+    void fromJson(const QJsonObject& data);
+
     QString name;
     QChar short_name;
 
@@ -21,7 +25,13 @@ struct ArgInfo
 
 class CommandInfo
 {
+
 public:
+    CommandInfo() = default;
+    CommandInfo(const QByteArray& data);
+
+    QJsonObject toJson() const;
+    void fromJson(const QByteArray& data);
 
     void setName(const QString& pNaame);
     void addArg(const ArgInfo& pArg);
@@ -35,14 +45,15 @@ public:
     bool hasHelpTip() const;
 
 private:
+    QJsonArray argumentsToJson() const;
+    void argumentsFromJson(const QJsonArray& array);
     QString mName;
     QString mHelp_tip;
     QList<ArgInfo> mArguments;
-    //if true, track creation and destruction and output to console
     bool mFlag_track;
 };
 
-class CommandRepresent:public QObject
+class CommandRepresent:public CommandRepresentSimpleSource
 {
     Q_OBJECT
 public:
@@ -55,6 +66,10 @@ public:
 
 signals:
     void call_signal(const QVector<QString>&);
+    void destroyed(const QString&);
+
+public slots:
+    void commandDestroyed_slot();
 
 private:
     static QStringList splitArgsLine(const QString & pArgs_str);
@@ -82,14 +97,16 @@ public:
 
     template<class Obj_t, class MFunc_t>
     Command& link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
-    void addToUI(const CommandInfo& pInfo);
 
     void enable();
     void disable(const QString& pReason = "");
     bool isEnable() const;
 
-private slots:
-    void exec_slot(const QVector<QString>& pArg_vals) const;
+public slots:
+    virtual void exec_slot(const QVector<QString> & pArg_vals);
+
+signals:
+    void destroyed();
 
 private:
 

@@ -18,7 +18,7 @@ public:
 
     CommandParser() = default;
 
-    void addCommand(const Command& pCommand, const CommandInfo& pInfo);
+    CommandRepresent* addCommand(const CommandInfo& pInfo);
     void removeCommand(const QString &pCommand_name);
     void parseString(const QString& pCommand_str);
 

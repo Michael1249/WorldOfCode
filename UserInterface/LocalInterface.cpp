@@ -7,8 +7,8 @@
 namespace UI
 {
 
-LocalInterface::LocalInterface(QCoreApplication *parent):
-    InterfaceSimpleSource (parent)
+LocalInterface::LocalInterface(QCoreApplication *pApp):
+    InterfaceSimpleSource (pApp)
 {
     // init help request command
     CommandInfo info;
@@ -23,8 +23,7 @@ LocalInterface::LocalInterface(QCoreApplication *parent):
                             "show command's details if it's found."
             }
         );
-    mHelp_request_cmd.link_to(this, &LocalInterface::help_request);
-    addCommand_slot(mHelp_request_cmd, info);
+    addCommand(*this, &LocalInterface::help_request, info);
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
@@ -34,11 +33,12 @@ LocalInterface::LocalInterface(QCoreApplication *parent):
     input_thread.start();
 
     // init remoting
+    //TODO url should be overwrited with IP
     QUrl url = QUrl(QStringLiteral("local:interface"));
     mHost_node = new QRemoteObjectHost(url, this);
     mHost_node->enableRemoting(this); // enable remoting/sharing
     QTimer::singleShot(0, this, SLOT(run_slot()));
-    QObject::connect(this, SIGNAL(finished_signal()), parent, SLOT(quit()));
+    QObject::connect(this, SIGNAL(finished_signal()), pApp, SLOT(quit()));
 }
 
 void LocalInterface::addCommand_slot(Command& pCommand, const CommandInfo& pInfo)
@@ -66,11 +66,6 @@ void LocalInterface::removeCommand_slot(const QString &pCommand_name)
     mParser.removeCommand(pCommand_name);
 }
 
-void LocalInterface::test()
-{
-    qio::qout<< "QQQQ" << endl;
-}
-
 LocalInterface::~LocalInterface()
 {
     input_thread.quit();
@@ -79,8 +74,7 @@ LocalInterface::~LocalInterface()
 
 void LocalInterface::listenForInput()
 {
-    qio::qout << DEFAULT_INPUT;
-    qio::qout.flush();
+    qio::qout << DEFAULT_INPUT << flush;
     emit listenForInput_signal();
 }
 

@@ -3,14 +3,14 @@
 
 #include "InterfaceBase.h"
 
-class Worker
+class Worker : public QObject
 {
+    Q_OBJECT
 public:
     Worker(UI::InterfaceBase* pInterface, const QString& pName);
 
 private:
     void do_work(const QString& pWork);
-    UI::Command do_work_command;
 
     QString mName;
 

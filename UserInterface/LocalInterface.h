@@ -15,7 +15,7 @@ class InputReader: public QObject
     Q_OBJECT
 
 signals:
-    void newLineDetected_signal(const QString& line);
+    void newLineDetected_signal(const QString& pLine);
 public slots:
     void listenForInput_slot();
 };
@@ -25,28 +25,25 @@ class LocalInterface : public InterfaceSimpleSource, public InterfaceBase
     Q_OBJECT
 
 public:
-    LocalInterface(QCoreApplication *parent);
+    LocalInterface(QCoreApplication *pApp);
     ~LocalInterface();
-    void listenForInput();
 
 public slots:
     virtual void addCommand_slot(Command& pCommand, const CommandInfo& pInfo);
     virtual void addRemoteCommand_slot(const QByteArray& pInfo);
     virtual void removeCommand_slot(const QString &pCommand_name);
-    virtual void test();
     void run_slot();
-    void processLine_slot(const QString& line);
+    void processLine_slot(const QString& pLine);
 
 signals:
     void listenForInput_signal();
     void finished_signal();
 
 private:
-    friend class Command;
+    void listenForInput();
 
     // commands
     void help_request(const QString& pStr);
-    Command mHelp_request_cmd;
 
     QRemoteObjectHost* mHost_node;
     QThread input_thread;

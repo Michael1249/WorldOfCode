@@ -22,8 +22,10 @@ void UI::RemoteInterface::addCommand_slot(UI::Command &pCommand, const UI::Comma
     {
         mReplica->waitForSource();
         mReplica->addRemoteCommand_slot(QJsonDocument(pInfo.toJson()).toJson());
+
         auto command_rep = mReplica_node->acquire<CommandRepresentReplica>("interface/" + pInfo.getName());
         command_rep->setParent(&pCommand);
+
         QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
         QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
     });

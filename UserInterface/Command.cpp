@@ -11,6 +11,11 @@
 namespace UI
 {
 
+Command::Command(QObject *parent):
+    QObject (parent)
+{
+}
+
 Command::~Command()
 {
     emit destroyed();
@@ -112,7 +117,7 @@ QString removeBrackets(const QString& pStr)
     return result;
 }
 
-QVector<QString> CommandRepresent::parseArgsList(const QStringList &args_list) const
+QVector<QString> CommandRepresent::parseArgsList(const QStringList &pArgs_list) const
 {
     QVector<QString> values;
     QVector<bool> setted_values;
@@ -120,9 +125,9 @@ QVector<QString> CommandRepresent::parseArgsList(const QStringList &args_list) c
     setted_values.resize(mInfo.getArgumentsInfo().size());
     bool flag_ban_positional = false;
 
-    for (int i = 0; i < args_list.size(); ++i)
+    for (int i = 0; i < pArgs_list.size(); ++i)
     {
-        const QString& current_arg = args_list[i];
+        const QString& current_arg = pArgs_list[i];
 
         if(current_arg.startsWith('-'))
         {
@@ -262,10 +267,10 @@ QJsonArray CommandInfo::argumentsToJson() const
        return array;
 }
 
-void CommandInfo::argumentsFromJson(const QJsonArray &array)
+void CommandInfo::argumentsFromJson(const QJsonArray &pArray)
 {
     mArguments.clear();
-    for (const auto& iter : array)
+    for (const auto& iter : pArray)
     {
         mArguments.append(ArgInfo());
         mArguments.last().fromJson(iter.toObject());
@@ -277,9 +282,9 @@ bool CommandInfo::getFlagTrack() const
     return mFlag_track;
 }
 
-void CommandInfo::setFlagTrack(bool flag_track)
+void CommandInfo::setFlagTrack(bool pFlag_track)
 {
-    mFlag_track = flag_track;
+    mFlag_track = pFlag_track;
 }
 
 CommandRepresent::CommandRepresent(const CommandInfo &pInfo):
@@ -325,12 +330,12 @@ QJsonObject ArgInfo::toJson() const
     return json;
 }
 
-void ArgInfo::fromJson(const QJsonObject &data)
+void ArgInfo::fromJson(const QJsonObject &pData)
 {
-    name = data["name"].toString();
-    short_name = data["short_name"].toString()[0];
-    help_tip = data["help_tip"].toString();
-    default_value = data["default_value"].toString();
+    name = pData["name"].toString();
+    short_name = pData["short_name"].toString()[0];
+    help_tip = pData["help_tip"].toString();
+    default_value = pData["default_value"].toString();
 }
 
 } // UI

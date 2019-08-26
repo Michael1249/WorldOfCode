@@ -20,7 +20,6 @@ CommandRepresent* CommandParser::addCommand(const CommandInfo& pInfo)
     ).value().data();
 
     return command_rep;
-    //QObject::connect(command_rep, SIGNAL(call_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
 }
 
 void CommandParser::removeCommand(const QString &pCommand_name)

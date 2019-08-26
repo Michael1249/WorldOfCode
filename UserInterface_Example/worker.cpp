@@ -17,8 +17,7 @@ Worker::Worker(UI::InterfaceBase *pInterface, const QString &pName):
                 .default_value = "sleep"
             }
         );
-    do_work_command.link_to(this, &Worker::do_work);
-    pInterface->addCommand_slot(do_work_command, info);
+    pInterface->addCommand(*this, &Worker::do_work, info);
 }
 
 void Worker::do_work(const QString &pWork)

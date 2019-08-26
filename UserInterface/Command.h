@@ -65,7 +65,6 @@ public:
     void callCommand(const QString&);
 
 signals:
-    void call_signal(const QVector<QString>&);
     void destroyed(const QString&);
 
 public slots:

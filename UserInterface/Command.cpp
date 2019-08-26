@@ -264,9 +264,12 @@ QJsonArray CommandInfo::argumentsToJson() const
 
 void CommandInfo::argumentsFromJson(const QJsonArray &array)
 {
-    auto iter = array.begin();
-    for (auto& arg_info : mArguments)
-       arg_info.fromJson(iter->toObject());
+    mArguments.clear();
+    for (const auto& iter : array)
+    {
+        mArguments.append(ArgInfo());
+        mArguments.last().fromJson(iter.toObject());
+    }
 }
 
 bool CommandInfo::getFlagTrack() const
@@ -300,7 +303,7 @@ void CommandRepresent::callCommand(const QString& pArgs)
     {
         auto args_list = splitArgsLine(pArgs);
         auto arg_vals = parseArgsList(args_list);
-        emit call_signal(arg_vals);
+        emit exec_signal(arg_vals);
     }
     catch (QExceptionMessage& e)
     {

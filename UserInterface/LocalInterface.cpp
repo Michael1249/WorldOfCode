@@ -43,8 +43,9 @@ LocalInterface::LocalInterface(QCoreApplication *parent):
 
 void LocalInterface::addCommand_slot(Command& pCommand, const CommandInfo& pInfo)
 {
+    qio::qout << CMD_INIT_MSG << pInfo.getName() << endl;
     auto command_rep = mParser.addCommand(pInfo);
-    QObject::connect(command_rep, SIGNAL(call_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
+    QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
     QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
     QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
 }
@@ -52,6 +53,7 @@ void LocalInterface::addCommand_slot(Command& pCommand, const CommandInfo& pInfo
 void LocalInterface::addRemoteCommand_slot(const QByteArray &pInfo)
 {
     CommandInfo command_info(pInfo);
+    qio::qout << CMD_INIT_MSG << command_info.getName() << endl;
     auto command_rep = mParser.addCommand(command_info);
     QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
     mHost_node->enableRemoting(command_rep, "interface/" + command_info.getName());
@@ -59,6 +61,7 @@ void LocalInterface::addRemoteCommand_slot(const QByteArray &pInfo)
 
 void LocalInterface::removeCommand_slot(const QString &pCommand_name)
 {
+    qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
     qio::qout << pCommand_name << endl;
     mParser.removeCommand(pCommand_name);
 }

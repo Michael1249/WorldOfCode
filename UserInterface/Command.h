@@ -6,12 +6,16 @@
 #include <QObject>
 #include <QVector>
 #include "CommandDelegate.h"
+#include "CommandRepresent_source.h"
 
 namespace UI
 {
 
 struct ArgInfo
 {
+    QJsonObject toJson() const;
+    void fromJson(const QJsonObject& pData);
+
     QString name;
     QChar short_name;
 
@@ -21,12 +25,20 @@ struct ArgInfo
 
 class CommandInfo
 {
+
 public:
+    CommandInfo() = default;
+    CommandInfo(const QByteArray& pData);
+
+    // TODO: overwrite "serialization" with operator<< and operator>>
+    // instead casting to Json (aka QByteArray)
+    QJsonObject toJson() const;
+    void fromJson(const QByteArray& pData);
 
     void setName(const QString& pNaame);
     void addArg(const ArgInfo& pArg);
     void setHelpTip(const QString& pHelp_tip);
-    void setFlagTrack(bool flag_track);
+    void setFlagTrack(bool pFlag_track);
 
     const QString& getName() const;
     const QString& getHelpTip() const;
@@ -35,14 +47,15 @@ public:
     bool hasHelpTip() const;
 
 private:
+    QJsonArray argumentsToJson() const;
+    void argumentsFromJson(const QJsonArray& pArray);
     QString mName;
     QString mHelp_tip;
     QList<ArgInfo> mArguments;
-    //if true, track creation and destruction and output to console
     bool mFlag_track;
 };
 
-class CommandRepresent:public QObject
+class CommandRepresent:public CommandRepresentSimpleSource
 {
     Q_OBJECT
 public:
@@ -51,14 +64,17 @@ public:
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
 
-    void callCommand(const QString&);
+    void callCommand(const QString& pLine);
 
 signals:
-    void call_signal(const QVector<QString>&);
+    void destroyed(const QString&);
+
+public slots:
+    void commandDestroyed_slot();
 
 private:
     static QStringList splitArgsLine(const QString & pArgs_str);
-    QVector<QString> parseArgsList(const QStringList& args_list) const;
+    QVector<QString> parseArgsList(const QStringList& pArgs_list) const;
 
     CommandInfo mInfo;
 };
@@ -78,18 +94,21 @@ public:
 
     Q_DISABLE_COPY_MOVE(Command)
     Command() = default;
+    Command(QObject* parent);
     ~Command();
 
     template<class Obj_t, class MFunc_t>
-    Command& link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
-    void addToUI(const CommandInfo& pInfo);
+    void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
 
     void enable();
     void disable(const QString& pReason = "");
     bool isEnable() const;
 
-private slots:
-    void exec_slot(const QVector<QString>& pArg_vals) const;
+public slots:
+    virtual void exec_slot(const QVector<QString> & pArg_vals);
+
+signals:
+    void destroyed();
 
 private:
 
@@ -101,10 +120,9 @@ private:
 };
 
 template<class Obj_t, class MFunc_t>
-Command &Command::link_to(Obj_t *pObj_ptr, MFunc_t pMfunc_ptr)
+void Command::link_to(Obj_t *pObj_ptr, MFunc_t pMfunc_ptr)
 {
     mDelegate = getCommandDelegate(pObj_ptr, pMfunc_ptr);
-    return *this;
 }
 
 } //UI

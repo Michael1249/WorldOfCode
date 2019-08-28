@@ -1,0 +1,5 @@
+class Interface
+{
+    SLOT(addRemoteCommand_slot(const QByteArray& pInfo));
+    SLOT(removeCommand_slot(const QString& pName));
+};

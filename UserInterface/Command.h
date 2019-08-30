@@ -64,7 +64,7 @@ public:
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
 
-    void callCommand(const QString& pLine);
+    void execCommand(const QString& pArgs_line);
 
 signals:
     void destroyed(const QString&);

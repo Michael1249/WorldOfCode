@@ -1,9 +1,9 @@
 #ifndef WORKER_H
 #define WORKER_H
 
-#include "InterfaceBase.h"
+#include "ServiceBase.h"
 
-class Worker : public QObject
+class Worker : public UI::ServiceBase
 {
     Q_OBJECT
 public:

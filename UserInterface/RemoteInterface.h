@@ -14,11 +14,13 @@ class RemoteInterface :public QObject, public InterfaceBase
 
 public:
     RemoteInterface(const QUrl& pUrl);
-    ~RemoteInterface();
 
 public slots:
-    virtual void addCommand_slot(Command& pCommand, const CommandInfo& pInfo);
-    virtual void removeCommand_slot(const QString &pCommand_name);
+    virtual void addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo);
+
+protected slots:
+    virtual void addService_slot(const QString& pName, const QString& pHelp_tip);
+    virtual void removeService_slot(const QString& pName);
 
 private:
     QRemoteObjectNode* mReplica_node;

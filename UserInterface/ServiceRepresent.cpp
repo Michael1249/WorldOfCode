@@ -1,12 +1,18 @@
 #include "qiostream.h"
 #include "qexceptionmessage.h"
 #include "UIConstants.h"
-#include "CommandParser.h"
+#include "ServiceRepresent.h"
 
 namespace UI
 {
 
-CommandRepresent* CommandParser::addCommand(const CommandInfo& pInfo)
+ServiceRepresent::ServiceRepresent(const QString &pName, const QString &pHelp_tip):
+    mName(pName),
+    mHelpTip(pHelp_tip)
+{
+}
+
+CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 {
 
     if (mCommands.contains(pInfo.getName()))
@@ -18,16 +24,18 @@ CommandRepresent* CommandParser::addCommand(const CommandInfo& pInfo)
                 pInfo.getName(),
                 QPointer<CommandRepresent>(new CommandRepresent(pInfo))
     ).value().data();
-
+    QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
     return command_rep;
 }
 
-void CommandParser::removeCommand(const QString &pCommand_name)
+void ServiceRepresent::removeCommand_slot(const QString &pCommand_name)
 {
+    qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
+    qio::qout << pCommand_name << endl;
     mCommands.remove(pCommand_name);
 }
 
-void CommandParser::parseString(const QString& pCommand_str)
+void ServiceRepresent::processCommand(const QString& pCommand_str)
 {
     //TODO: owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);
@@ -39,7 +47,7 @@ void CommandParser::parseString(const QString& pCommand_str)
 
         if (command_iter != mCommands.end())
         {
-            command_iter.value()->callCommand(command_args);
+            command_iter.value()->execCommand(command_args);
         }
         else
         {
@@ -51,7 +59,7 @@ void CommandParser::parseString(const QString& pCommand_str)
 
 }
 
-const CommandParser::command_map &CommandParser::getCommands() const
+const ServiceRepresent::CommandMap &ServiceRepresent::getCommands() const
 {
     return mCommands;
 }

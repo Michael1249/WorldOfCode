@@ -1,10 +1,10 @@
-#ifndef INTERFACE_H
-#define INTERFACE_H
+#ifndef LOCALINTERFACE_H
+#define LOCALINTERFACE_H
 
 #include <QCoreApplication>
 #include <QThread>
 #include "InterfaceBase.h"
-#include "CommandParser.h"
+#include "ServiceRepresent.h"
 #include "Interface_source.h"
 
 namespace UI
@@ -25,15 +25,21 @@ class LocalInterface : public InterfaceSimpleSource, public InterfaceBase
     Q_OBJECT
 
 public:
+
+    using ServiceRepresentMap = QMap<QString, QPointer<ServiceRepresent>>;
+
     LocalInterface(QCoreApplication *pApp);
     ~LocalInterface();
 
 public slots:
-    virtual void addCommand_slot(Command& pCommand, const CommandInfo& pInfo);
-    virtual void addRemoteCommand_slot(const QByteArray& pInfo);
-    virtual void removeCommand_slot(const QString &pCommand_name);
+    virtual void addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo);
+    virtual void addRemoteCommand_slot(const QString& pService_name, const QByteArray& pInfo);
     void run_slot();
-    void processLine_slot(const QString& pLine);
+    void processCommand_slot(const QString& pLine);
+
+protected slots:
+    virtual void addService_slot(const QString& pName, const QString& pHelp_tip);
+    virtual void removeService_slot(const QString& pName);
 
 signals:
     void listenForInput_signal();
@@ -47,11 +53,11 @@ private:
 
     QRemoteObjectHost* mHost_node;
     QThread input_thread;
-    CommandParser mParser;
+    ServiceRepresentMap mServices;
     bool mFlag_run_end = false;
 
 };
 
 } // UI
 
-#endif // INTERFACE_H
+#endif // LOCALINTERFACE_H

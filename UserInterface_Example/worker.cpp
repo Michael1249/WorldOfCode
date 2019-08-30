@@ -3,6 +3,7 @@
 #include "QTimer"
 
 Worker::Worker(UI::InterfaceBase *pInterface, const QString &pName):
+    UI::ServiceBase (pInterface, "slaves"),
     mName(pName)
 {
     UI::CommandInfo info;
@@ -17,7 +18,7 @@ Worker::Worker(UI::InterfaceBase *pInterface, const QString &pName):
                 .default_value = "sleep"
             }
         );
-    pInterface->addCommand(*this, &Worker::do_work, info);
+    addCommand(*this, &Worker::do_work, info);
 }
 
 void Worker::do_work(const QString &pWork)

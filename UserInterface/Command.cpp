@@ -302,11 +302,11 @@ void CommandRepresent::setInfo(const CommandInfo& pInfo)
     mInfo = pInfo;
 }
 
-void CommandRepresent::callCommand(const QString& pArgs)
+void CommandRepresent::execCommand(const QString& pArgs_line)
 {
     try
     {
-        auto args_list = splitArgsLine(pArgs);
+        auto args_list = splitArgsLine(pArgs_line);
         auto arg_vals = parseArgsList(args_list);
         emit exec_signal(arg_vals);
     }

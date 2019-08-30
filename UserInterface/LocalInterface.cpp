@@ -10,6 +10,9 @@ namespace UI
 LocalInterface::LocalInterface(QCoreApplication *pApp):
     InterfaceSimpleSource (pApp)
 {
+    // Init Global service
+    addService_slot("","");
+
     // init help request command
     CommandInfo info;
     info.setName("help");
@@ -23,13 +26,13 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
                             "show command's details if it's found."
             }
         );
-    addCommand(*this, &LocalInterface::help_request, info);
+    addCommand("", *this, &LocalInterface::help_request, info);
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
     connect(&input_thread, &QThread::finished, reader, &QObject::deleteLater);
     connect(this, &LocalInterface::listenForInput_signal, reader, &InputReader::listenForInput_slot);
-    connect(reader, &InputReader::newLineDetected_signal, this, &LocalInterface::processLine_slot);
+    connect(reader, &InputReader::newLineDetected_signal, this, &LocalInterface::processCommand_slot);
     input_thread.start();
 
     // init remoting
@@ -41,30 +44,48 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     QObject::connect(this, SIGNAL(finished_signal()), pApp, SLOT(quit()));
 }
 
-void LocalInterface::addCommand_slot(Command& pCommand, const CommandInfo& pInfo)
+void LocalInterface::addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
 {
-    qio::qout << CMD_INIT_MSG << pInfo.getName() << endl;
-    auto command_rep = mParser.addCommand(pInfo);
-    QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
-    QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
-    QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
+    auto service_iter = mServices.find(pService_name);
+
+    if(service_iter != mServices.end())
+    {
+        qio::qout << CMD_INIT_MSG << pInfo.getName() << endl;
+        auto command_rep = service_iter.value()->addCommand(pInfo);
+        QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
+        QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
+
+    }
+    else
+    {
+
+    }
+
 }
 
-void LocalInterface::addRemoteCommand_slot(const QByteArray &pInfo)
+void LocalInterface::addRemoteCommand_slot(const QString& pService_name, const QByteArray &pInfo)
 {
-    CommandInfo command_info(pInfo);
-    qio::qout << CMD_INIT_MSG << command_info.getName() << endl;
-    auto command_rep = mParser.addCommand(command_info);
-    QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
-    mHost_node->enableRemoting(command_rep, "interface/" + command_info.getName());
+    auto service_iter = mServices.find(pService_name);
+
+    if(service_iter != mServices.end())
+    {
+        CommandInfo command_info(pInfo);
+        qio::qout << CMD_INIT_MSG << command_info.getName() << endl;
+        auto command_rep = service_iter.value()->addCommand(pInfo);
+        mHost_node->enableRemoting(command_rep, "interface/" + pService_name + "/" + command_info.getName());
+    }
+    else
+    {
+
+    }
 }
 
-void LocalInterface::removeCommand_slot(const QString &pCommand_name)
-{
-    qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
-    qio::qout << pCommand_name << endl;
-    mParser.removeCommand(pCommand_name);
-}
+//void LocalInterface::removeCommand_slot(const QString &pCommand_name)
+//{
+//    qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
+//    qio::qout << pCommand_name << endl;
+//    mServices.removeCommand(pCommand_name);
+//}
 
 LocalInterface::~LocalInterface()
 {
@@ -78,14 +99,39 @@ void LocalInterface::listenForInput()
     emit listenForInput_signal();
 }
 
+void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_tip)
+{
+    mServices.insert(pName, QPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
+}
+
+void LocalInterface::removeService_slot(const QString &pName)
+{
+    mServices.remove(pName);
+}
+
 void LocalInterface::run_slot()
 {
     listenForInput();
 }
 
-void LocalInterface::processLine_slot(const QString &line)
+void LocalInterface::processCommand_slot(const QString &line)
 {
-    mParser.parseString(line);
+    QString service_name = line.section(" ", 0, 0);
+    QString command_line = line.section(" ", 1);
+
+    if(service_name != "")
+    {
+        auto service_iter = mServices.find(service_name);
+        if(service_iter != mServices.end())
+        {
+            service_iter.value()->processCommand(command_line);
+        }
+        else
+        {
+            mServices.begin().value()->processCommand(command_line);
+        }
+    }
+
     if(mFlag_run_end)
     {
         emit finished_signal();
@@ -98,83 +144,83 @@ void LocalInterface::processLine_slot(const QString &line)
 
 void LocalInterface::help_request(const QString &pStr)
 {
-    auto command_map = mParser.getCommands();
+//    auto command_map = mServices.getCommands();
 
-    for(auto iter = command_map.begin(); iter != command_map.end();)
-    {
-        if(!iter.value()->getInfo().getName().contains(pStr, Qt::CaseInsensitive))
-        {
-            iter = command_map.erase(iter);
-        }
-        else
-        {
-            ++iter;
-        }
-    }
+//    for(auto iter = command_map.begin(); iter != command_map.end();)
+//    {
+//        if(!iter.value()->getInfo().getName().contains(pStr, Qt::CaseInsensitive))
+//        {
+//            iter = command_map.erase(iter);
+//        }
+//        else
+//        {
+//            ++iter;
+//        }
+//    }
 
-    if (command_map.size() == 0)
-    {
-        qio::qout << NOTHING_FOUND_MSG << endl;
-    }
-    else if(command_map.size() == 1)
-    {
-        auto command = command_map.begin().value();
-        qio::qout << command->getInfo().getName();
+//    if (command_map.size() == 0)
+//    {
+//        qio::qout << NOTHING_FOUND_MSG << endl;
+//    }
+//    else if(command_map.size() == 1)
+//    {
+//        auto command = command_map.begin().value();
+//        qio::qout << command->getInfo().getName();
 
-        for (auto& arg: command->getInfo().getArgumentsInfo())
-        {
-            qio::qout << QString(" <%1>").arg(arg.name);
-        }
+//        for (auto& arg: command->getInfo().getArgumentsInfo())
+//        {
+//            qio::qout << QString(" <%1>").arg(arg.name);
+//        }
 
-        qio::qout << endl;
+//        qio::qout << endl;
 
-        if(command->getInfo().hasHelpTip())
-        {
-            qio::qout << command->getInfo().getHelpTip() << endl;
-        }
+//        if(command->getInfo().hasHelpTip())
+//        {
+//            qio::qout << command->getInfo().getHelpTip() << endl;
+//        }
 
-        if(command->getInfo().getArgumentsInfo().size())
-        {
-            qio::qout << left;
+//        if(command->getInfo().getArgumentsInfo().size())
+//        {
+//            qio::qout << left;
 
-            for (auto& arg: command->getInfo().getArgumentsInfo())
-            {
-                qio::qout << QString(40, '_')
-                          << endl
-                          << QString("<%1, %2> = \"%3\"")
-                             .arg(arg.name)
-                             .arg(arg.short_name)
-                             .arg(arg.default_value)
-                          << endl
-                          << arg.help_tip
-                          << endl;
-            }
+//            for (auto& arg: command->getInfo().getArgumentsInfo())
+//            {
+//                qio::qout << QString(40, '_')
+//                          << endl
+//                          << QString("<%1, %2> = \"%3\"")
+//                             .arg(arg.name)
+//                             .arg(arg.short_name)
+//                             .arg(arg.default_value)
+//                          << endl
+//                          << arg.help_tip
+//                          << endl;
+//            }
 
-        }
-        else
-        {
-            qio::qout << WITHOUT_ARGUMENTS_MSG << endl;
-        }
+//        }
+//        else
+//        {
+//            qio::qout << WITHOUT_ARGUMENTS_MSG << endl;
+//        }
 
-    }
-    else
-    {
-        for(auto command : command_map)
-        {
-            qio::qout << qSetFieldWidth(16)
-                      << left
-                      << command->getInfo().getName();
-            if(command->getInfo().hasHelpTip())
-            {
-                qio::qout << qSetFieldWidth(0)
-                          << " : "
-                          << command->getInfo().getHelpTip();
-            }
-            qio::qout << endl;
-        }
-    }
+//    }
+//    else
+//    {
+//        for(auto command : command_map)
+//        {
+//            qio::qout << qSetFieldWidth(16)
+//                      << left
+//                      << command->getInfo().getName();
+//            if(command->getInfo().hasHelpTip())
+//            {
+//                qio::qout << qSetFieldWidth(0)
+//                          << " : "
+//                          << command->getInfo().getHelpTip();
+//            }
+//            qio::qout << endl;
+//        }
+//    }
 
-  qio::qout.flush();
+//  qio::qout.flush();
 }
 
 void InputReader::listenForInput_slot()

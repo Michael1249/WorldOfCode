@@ -49,7 +49,8 @@ private:
     void listenForInput();
 
     // commands
-    void help_request(const QString& pStr);
+    void help_cmd(const QString& pStr);
+    void sync_cmd();
 
     QRemoteObjectHost* mHost_node;
     QThread input_thread;

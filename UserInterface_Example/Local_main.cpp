@@ -8,7 +8,9 @@ int main(int argc, char *argv[])
 
     UI::LocalInterface interface(&a);
 
-    Worker worker(&interface, "Sam");
+    Worker worker1(&interface, "Sam");
+
+    Worker worker2(&interface, "Bob");
 
     return a.exec();
 }

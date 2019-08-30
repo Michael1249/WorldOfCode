@@ -10,13 +10,12 @@ UI::RemoteInterface::RemoteInterface(const QUrl &pUrl)
     mReplica_node->connectToNode(pUrl); // connect with remote host node
 
     mReplica.reset(mReplica_node->acquire<InterfaceReplica>()); // acquire replica of source from host node
+    QObject::connect(mReplica.data(), SIGNAL(synchronize_signal()), this, SLOT(sync()));
 }
 
 
 void UI::RemoteInterface::addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
 {
-    QTimer::singleShot(0, [this, pService_name, &pCommand, pInfo]()
-    {
         mReplica->waitForSource();
         mReplica->addRemoteCommand_slot(pService_name, QJsonDocument(pInfo.toJson()).toJson());
 
@@ -25,17 +24,21 @@ void UI::RemoteInterface::addCommand_slot(const QString& pService_name, Command&
 
         QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
         QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
-    });
-
 }
 
 void UI::RemoteInterface::addService_slot(const QString &pName, const QString &pHelp_tip)
 {
-    mReplica->addService_slot(pName, pHelp_tip);
+        mReplica->waitForSource();
+        mReplica->addService_slot(pName, pHelp_tip);
 }
 
 void UI::RemoteInterface::removeService_slot(const QString &pName)
 {
     mReplica->removeService_slot(pName);
+}
+
+void UI::RemoteInterface::sync()
+{
+    printf("SYNC");
 }
 

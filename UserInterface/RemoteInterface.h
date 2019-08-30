@@ -21,6 +21,7 @@ public slots:
 protected slots:
     virtual void addService_slot(const QString& pName, const QString& pHelp_tip);
     virtual void removeService_slot(const QString& pName);
+    void sync();
 
 private:
     QRemoteObjectNode* mReplica_node;

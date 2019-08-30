@@ -25,6 +25,7 @@ CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
                 QPointer<CommandRepresent>(new CommandRepresent(pInfo))
     ).value().data();
     QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
+
     return command_rep;
 }
 
@@ -37,6 +38,7 @@ void ServiceRepresent::removeCommand_slot(const QString &pCommand_name)
 
 void ServiceRepresent::processCommand(const QString& pCommand_str)
 {
+
     //TODO: owerwrite with stringview, unnececary init new stings
     QString command_name = pCommand_str.section(" ", 0, 0);
     QString command_args = pCommand_str.section(" ", 1);

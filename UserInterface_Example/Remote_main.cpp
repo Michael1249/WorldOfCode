@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
 
     UI::RemoteInterface interface(QUrl(QStringLiteral("local:interface")));
 
-    Worker worker(&interface, "Martin");
+    Worker worker1(&interface, "Martin");
+
+    Worker worker2(&interface, "Roy");
 
     return a.exec();
 }

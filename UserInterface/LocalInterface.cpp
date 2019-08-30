@@ -14,10 +14,10 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     addService_slot("","");
 
     // init help request command
-    CommandInfo info;
-    info.setName("help");
-    info.setHelpTip("helps to find command and get discription");
-    info.addArg(
+    CommandInfo help_request_info;
+    help_request_info.setName("help");
+    help_request_info.setHelpTip("helps to find command and get discription");
+    help_request_info.addArg(
             ArgInfo
             {
                 .name="filter",
@@ -26,7 +26,13 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
                             "show command's details if it's found."
             }
         );
-    addCommand("", *this, &LocalInterface::help_request, info);
+    addCommand("", *this, &LocalInterface::help_cmd, help_request_info);
+
+    // init sync request command
+    CommandInfo sync_request_info;
+    sync_request_info.setName("sync");
+    sync_request_info.setHelpTip("Synchronize data from existing services.");
+    addCommand("", *this, &LocalInterface::sync_cmd, sync_request_info);
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
@@ -78,14 +84,9 @@ void LocalInterface::addRemoteCommand_slot(const QString& pService_name, const Q
     {
 
     }
+
 }
 
-//void LocalInterface::removeCommand_slot(const QString &pCommand_name)
-//{
-//    qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
-//    qio::qout << pCommand_name << endl;
-//    mServices.removeCommand(pCommand_name);
-//}
 
 LocalInterface::~LocalInterface()
 {
@@ -101,7 +102,10 @@ void LocalInterface::listenForInput()
 
 void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_tip)
 {
-    mServices.insert(pName, QPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
+    if (!mServices.contains(pName))
+    {
+         mServices.insert(pName, QPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
+    }
 }
 
 void LocalInterface::removeService_slot(const QString &pName)
@@ -122,14 +126,16 @@ void LocalInterface::processCommand_slot(const QString &line)
     if(service_name != "")
     {
         auto service_iter = mServices.find(service_name);
+
         if(service_iter != mServices.end())
         {
             service_iter.value()->processCommand(command_line);
         }
         else
         {
-            mServices.begin().value()->processCommand(command_line);
+            mServices.begin().value()->processCommand(line);
         }
+
     }
 
     if(mFlag_run_end)
@@ -142,7 +148,7 @@ void LocalInterface::processCommand_slot(const QString &line)
     }
 }
 
-void LocalInterface::help_request(const QString &pStr)
+void LocalInterface::help_cmd(const QString &pStr)
 {
 //    auto command_map = mServices.getCommands();
 
@@ -220,7 +226,12 @@ void LocalInterface::help_request(const QString &pStr)
 //        }
 //    }
 
-//  qio::qout.flush();
+    //  qio::qout.flush();
+}
+
+void LocalInterface::sync_cmd()
+{
+    emit synchronize_signal();
 }
 
 void InputReader::listenForInput_slot()

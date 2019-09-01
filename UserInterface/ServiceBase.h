@@ -36,7 +36,7 @@ private:
 template<class obj_t, class mFunc_t>
 void ServiceBase::addCommand(obj_t *pObj, mFunc_t pFunc, const CommandInfo &pInfo)
 {
-    Command* cmd = new Command(pObj);
+    Command* cmd = new Command(pObj, pInfo);
     cmd->link_to(pObj, pFunc);
     connectDestroyCommands_signal(cmd);
     mInterface->addExistCommand(mName, *cmd, pInfo);

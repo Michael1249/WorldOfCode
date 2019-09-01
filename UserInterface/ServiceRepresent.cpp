@@ -14,12 +14,6 @@ ServiceRepresent::ServiceRepresent(const QString &pName, const QString &pHelp_ti
 
 CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 {
-
-    if (mCommands.contains(pInfo.getName()))
-    {
-        throw QExceptionMessage(ERR_CMD_REDEFINE.arg(pInfo.getName()));
-    }
-
     auto command_rep = mCommands.insert(
                 pInfo.getName(),
                 QPointer<CommandRepresent>(new CommandRepresent(pInfo))

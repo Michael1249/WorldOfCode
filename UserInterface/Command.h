@@ -93,8 +93,10 @@ class Command: public QObject
 public:
 
     Q_DISABLE_COPY_MOVE(Command)
-    Command(QObject* parent);
+    Command(QObject* parent, CommandInfo pInfo);
     ~Command();
+
+    const CommandInfo& getInfo() const;
 
     template<class Obj_t, class MFunc_t>
     void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
@@ -106,7 +108,7 @@ signals:
     void destroyed();
 
 private:
-
+    CommandInfo mInfo;
     std::unique_ptr<ICommandDelegate> mDelegate;
 };
 

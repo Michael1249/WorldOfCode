@@ -2,6 +2,7 @@
 #define INTERFACEBASE_H
 
 #include "Command.h"
+#include "UIConstants.h"
 
 namespace UI
 {
@@ -32,13 +33,13 @@ protected:
 template<class obj_t, class mFunc_t>
 void InterfaceBase::addGlobalCommand(obj_t *pObj, mFunc_t pFunc, const CommandInfo &pInfo)
 {
-    addCommand("", pObj, pFunc, pInfo);
+    addCommand(GLOBAL_SERVICE_NAME, pObj, pFunc, pInfo);
 }
 
 template<class obj_t, class mFunc_t>
 void InterfaceBase::addCommand(const QString& pService_name, obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo)
 {
-    Command* cmd = new Command(pObj);
+    Command* cmd = new Command(pObj, pInfo);
     cmd->link_to(pObj, pFunc);
     addExistCommand(pService_name, *cmd, pInfo);
 }

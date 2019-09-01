@@ -12,7 +12,7 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     InterfaceSimpleSource (pApp)
 {
     // Init Global service
-    addService_slot("","");
+    addService_slot(GLOBAL_SERVICE_NAME,"");
 
     // init help request command
     CommandInfo help_request_info;
@@ -58,6 +58,7 @@ void LocalInterface::addService(ServiceBase* pServise)
 
 void LocalInterface::addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
 {
+    // TODO: overwrite this shit
     auto service_iter = mServices.find(pService_name);
 
     if(service_iter != mServices.end())
@@ -66,10 +67,22 @@ void LocalInterface::addExistCommand(const QString& pService_name, Command& pCom
         auto command_rep = service_iter.value()->addCommand(pInfo);
         QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
         QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
-//        QObject::connect(this, &LocalInterface::synchronize_signal, &pCommand, [&pCommand, &pService_name]()
-//        {
-//            8512
-//        });
+        QObject::connect(this, &LocalInterface::synchronize_signal, &pCommand, [this, &pCommand, &pService_name]()
+        {
+            auto service_iter = mServices.find(pService_name);
+
+            if(service_iter != mServices.end())
+            {
+                qio::qout << CMD_INIT_MSG << pCommand.getInfo().getName() << endl;
+                auto command_rep = service_iter.value()->addCommand(pCommand.getInfo());
+                QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
+                QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
+            }
+            else
+            {
+                // TODO: exception or ???
+            }
+        });
     }
     else
     {

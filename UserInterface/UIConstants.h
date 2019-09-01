@@ -6,6 +6,7 @@
 namespace
 {
 
+const QString GLOBAL_SERVICE_NAME = "global";
 const QString INIT_CMD_NAME = "init";
 const QString EXIT_CMD_NAME = "exit";
 const QString INIT_CMD_HELP_TIP = "Initiates %1 UI component. %2";

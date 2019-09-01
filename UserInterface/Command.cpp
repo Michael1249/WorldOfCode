@@ -11,14 +11,20 @@
 namespace UI
 {
 
-Command::Command(QObject *parent):
-    QObject (parent)
+Command::Command(QObject *parent, CommandInfo pInfo):
+    QObject (parent),
+    mInfo(pInfo)
 {
 }
 
 Command::~Command()
 {
     emit destroyed();
+}
+
+const CommandInfo &Command::getInfo() const
+{
+    return mInfo;
 }
 
 void Command::exec_slot(const QVector<QString> &pArg_vals)

@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include "RemoteInterface.h"
 #include "CommandRepresent_replica.h"
+#include "ServiceBase.h"
 
 UI::RemoteInterface::RemoteInterface(const QUrl &pUrl)
 {
@@ -14,7 +15,7 @@ UI::RemoteInterface::RemoteInterface(const QUrl &pUrl)
 }
 
 
-void UI::RemoteInterface::addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
+void UI::RemoteInterface::addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
 {
         mReplica->waitForSource();
         mReplica->addRemoteCommand_slot(pService_name, QJsonDocument(pInfo.toJson()).toJson());
@@ -40,5 +41,10 @@ void UI::RemoteInterface::removeService_slot(const QString &pName)
 void UI::RemoteInterface::sync()
 {
     printf("SYNC");
+}
+
+void UI::RemoteInterface::addService(UI::ServiceBase *pServise)
+{
+    addService_slot(pServise->getName(), pServise->getHelpTip());
 }
 

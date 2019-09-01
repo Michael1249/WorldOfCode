@@ -32,12 +32,11 @@ public:
     ~LocalInterface();
 
 public slots:
-    virtual void addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo);
-    virtual void addRemoteCommand_slot(const QString& pService_name, const QByteArray& pInfo);
     void run_slot();
     void processCommand_slot(const QString& pLine);
 
-protected slots:
+private slots:
+    virtual void addRemoteCommand_slot(const QString& pService_name, const QByteArray& pInfo);
     virtual void addService_slot(const QString& pName, const QString& pHelp_tip);
     virtual void removeService_slot(const QString& pName);
 
@@ -46,6 +45,8 @@ signals:
     void finished_signal();
 
 private:
+    virtual void addService(ServiceBase* pServise);
+    virtual void addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo);
     void listenForInput();
 
     // commands

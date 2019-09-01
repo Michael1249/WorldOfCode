@@ -3,6 +3,7 @@
 #include <QTimer>
 #include "UIConstants.h"
 #include "LocalInterface.h"
+#include "ServiceBase.h"
 
 namespace UI
 {
@@ -26,13 +27,13 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
                             "show command's details if it's found."
             }
         );
-    addCommand("", *this, &LocalInterface::help_cmd, help_request_info);
+    addGlobalCommand(this, &LocalInterface::help_cmd, help_request_info);
 
     // init sync request command
     CommandInfo sync_request_info;
     sync_request_info.setName("sync");
     sync_request_info.setHelpTip("Synchronize data from existing services.");
-    addCommand("", *this, &LocalInterface::sync_cmd, sync_request_info);
+    addGlobalCommand(this, &LocalInterface::sync_cmd, sync_request_info);
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
@@ -50,7 +51,12 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     QObject::connect(this, SIGNAL(finished_signal()), pApp, SLOT(quit()));
 }
 
-void LocalInterface::addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
+void LocalInterface::addService(ServiceBase* pServise)
+{
+    addService_slot(pServise->getName(), pServise->getHelpTip());
+}
+
+void LocalInterface::addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
 {
     auto service_iter = mServices.find(pService_name);
 
@@ -60,11 +66,14 @@ void LocalInterface::addCommand_slot(const QString& pService_name, Command& pCom
         auto command_rep = service_iter.value()->addCommand(pInfo);
         QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
         QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
-
+//        QObject::connect(this, &LocalInterface::synchronize_signal, &pCommand, [&pCommand, &pService_name]()
+//        {
+//            8512
+//        });
     }
     else
     {
-
+        // TODO: exception or ???
     }
 
 }

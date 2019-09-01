@@ -21,54 +21,20 @@ Command::~Command()
     emit destroyed();
 }
 
-void Command::enable()
-{
-    mIs_enable = true;
-}
-
-void Command::disable(const QString& pReason)
-{
-    if(pReason.size())
-    {
-        mDisable_reason = pReason;
-    }
-    else
-    {
-        mDisable_reason = CMD_DISABLE_REASON;
-    }
-
-    mIs_enable = false;
-}
-
-bool Command::isEnable() const
-{
-    return mIs_enable;
-}
-
 void Command::exec_slot(const QVector<QString> &pArg_vals)
 {
-    if(mIs_enable)
+    try
     {
-
-        try
-        {
-            mDelegate.get()->Invoke(pArg_vals);
-        }
-        catch (QExceptionMessage& e)
-        {
-            qio::qout << "[ERROR]: " << e.getMessage() << endl;
-        }
-        catch (std::exception& e)
-        {
-            qio::qout << "[ERROR]: " << e.what() << endl;
-        }
-
+        mDelegate.get()->Invoke(pArg_vals);
     }
-    else
+    catch (QExceptionMessage& e)
     {
-        qio::qout << mDisable_reason << endl;
+        qio::qout << "[ERROR]: " << e.getMessage() << endl;
     }
-
+    catch (std::exception& e)
+    {
+        qio::qout << "[ERROR]: " << e.what() << endl;
+    }
 }
 
 // NOT MY CODE

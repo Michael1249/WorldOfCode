@@ -93,16 +93,11 @@ class Command: public QObject
 public:
 
     Q_DISABLE_COPY_MOVE(Command)
-    Command() = default;
     Command(QObject* parent);
     ~Command();
 
     template<class Obj_t, class MFunc_t>
     void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
-
-    void enable();
-    void disable(const QString& pReason = "");
-    bool isEnable() const;
 
 public slots:
     virtual void exec_slot(const QVector<QString> & pArg_vals);
@@ -112,11 +107,7 @@ signals:
 
 private:
 
-    QString pName;
     std::unique_ptr<ICommandDelegate> mDelegate;
-
-    bool mIs_enable = true;
-    QString mDisable_reason;
 };
 
 template<class Obj_t, class MFunc_t>

@@ -5,32 +5,42 @@
 
 namespace UI
 {
-
+class ServiceBase;
 class InterfaceBase
 {
 public:
 
+    Q_DISABLE_COPY_MOVE(InterfaceBase)
+    InterfaceBase() = default;
     virtual ~InterfaceBase() = default;
 
-    virtual void addCommand_slot(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo) = 0;
-
     template<class obj_t, class mFunc_t>
-    void addCommand(const QString& pService_name, obj_t& pObj, mFunc_t pFunc, const CommandInfo& pInfo);
+    void addGlobalCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo);
 
 protected:
     friend class ServiceBase;
 
+    template<class obj_t, class mFunc_t>
+    void addCommand(const QString& pService_name, obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo);
+    virtual void addService(ServiceBase* pServise) = 0;
+    virtual void addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo) = 0;
     virtual void addService_slot(const QString& pName, const QString& pHelp_tip) = 0;
     virtual void removeService_slot(const QString& pName) = 0;
 
 };
 
 template<class obj_t, class mFunc_t>
-void InterfaceBase::addCommand(const QString& pService_name, obj_t& pObj, mFunc_t pFunc, const CommandInfo& pInfo)
+void InterfaceBase::addGlobalCommand(obj_t *pObj, mFunc_t pFunc, const CommandInfo &pInfo)
 {
-    Command* cmd = new Command(&pObj);
-    cmd->link_to(&pObj, pFunc);
-    addCommand_slot(pService_name, *cmd, pInfo);
+    addCommand("", pObj, pFunc, pInfo);
+}
+
+template<class obj_t, class mFunc_t>
+void InterfaceBase::addCommand(const QString& pService_name, obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo)
+{
+    Command* cmd = new Command(pObj);
+    cmd->link_to(pObj, pFunc);
+    addExistCommand(pService_name, *cmd, pInfo);
 }
 
 } // UI

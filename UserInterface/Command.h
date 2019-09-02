@@ -105,7 +105,7 @@ public slots:
     virtual void exec_slot(const QVector<QString> & pArg_vals);
 
 signals:
-    void destroyed();
+    void destroyed_signal();
 
 private:
     CommandInfo mInfo;

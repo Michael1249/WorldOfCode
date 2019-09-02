@@ -14,6 +14,7 @@ ServiceRepresent::ServiceRepresent(const QString &pName, const QString &pHelp_ti
 
 CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 {
+    qio::qout << CMD_INIT_MSG << pInfo.getName() << endl;
     auto command_rep = mCommands.insert(
                 pInfo.getName(),
                 QPointer<CommandRepresent>(new CommandRepresent(pInfo))
@@ -26,7 +27,6 @@ CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 void ServiceRepresent::removeCommand_slot(const QString &pCommand_name)
 {
     qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
-    qio::qout << pCommand_name << endl;
     mCommands.remove(pCommand_name);
 }
 

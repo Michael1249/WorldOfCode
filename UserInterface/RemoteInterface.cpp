@@ -24,7 +24,7 @@ void UI::RemoteInterface::addExistCommand(const QString& pService_name, Command&
         command_rep->setParent(&pCommand);
 
         QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
-        QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
+        QObject::connect(&pCommand, SIGNAL(destroyed_signal()), command_rep, SLOT(commandDestroyed_slot()));
 }
 
 void UI::RemoteInterface::addService_slot(const QString &pName, const QString &pHelp_tip)

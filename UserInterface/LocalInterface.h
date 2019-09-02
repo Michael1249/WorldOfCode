@@ -53,6 +53,11 @@ private:
     void help_cmd(const QString& pStr);
     void sync_cmd();
 
+    void init_help_cmd();
+    void init_sync_cmd();
+
+    void init_remoting();
+
     QRemoteObjectHost* mHost_node;
     QThread input_thread;
     ServiceRepresentMap mServices;

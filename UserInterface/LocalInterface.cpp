@@ -12,28 +12,10 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     InterfaceSimpleSource (pApp)
 {
     // Init Global service
-    addService_slot(GLOBAL_SERVICE_NAME,"");
+    addService_slot(GLOBAL_SERVICE_NAME, GLOBAL_SERVICE_HELP_TIP);
 
-    // init help request command
-    CommandInfo help_request_info;
-    help_request_info.setName("help");
-    help_request_info.setHelpTip("helps to find command and get discription");
-    help_request_info.addArg(
-            ArgInfo
-            {
-                .name="filter",
-                .short_name = 'f',
-                .help_tip = "search for commands which contain <filter>,\n"
-                            "show command's details if it's found."
-            }
-        );
-    addGlobalCommand(this, &LocalInterface::help_cmd, help_request_info);
-
-    // init sync request command
-    CommandInfo sync_request_info;
-    sync_request_info.setName("sync");
-    sync_request_info.setHelpTip("Synchronize data from existing services.");
-    addGlobalCommand(this, &LocalInterface::sync_cmd, sync_request_info);
+    init_help_cmd();
+    init_sync_cmd();
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
@@ -42,12 +24,8 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     connect(reader, &InputReader::newLineDetected_signal, this, &LocalInterface::processCommand_slot);
     input_thread.start();
 
-    // init remoting
-    //TODO url should be overwrited with IP
-    QUrl url = QUrl(QStringLiteral("local:interface"));
-    mHost_node = new QRemoteObjectHost(url, this);
-    mHost_node->enableRemoting(this); // enable remoting/sharing
-    QTimer::singleShot(0, this, SLOT(run_slot()));
+    init_remoting();
+
     QObject::connect(this, SIGNAL(finished_signal()), pApp, SLOT(quit()));
 }
 
@@ -63,17 +41,15 @@ void LocalInterface::addExistCommand(const QString& pService_name, Command& pCom
 
     if(service_iter != mServices.end())
     {
-        qio::qout << CMD_INIT_MSG << pInfo.getName() << endl;
         auto command_rep = service_iter.value()->addCommand(pInfo);
         QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
-        QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
+        QObject::connect(&pCommand, SIGNAL(destroyed_signal()), command_rep, SLOT(commandDestroyed_slot()));
         QObject::connect(this, &LocalInterface::synchronize_signal, &pCommand, [this, &pCommand, &pService_name]()
         {
             auto service_iter = mServices.find(pService_name);
 
             if(service_iter != mServices.end())
             {
-                qio::qout << CMD_INIT_MSG << pCommand.getInfo().getName() << endl;
                 auto command_rep = service_iter.value()->addCommand(pCommand.getInfo());
                 QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
                 QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
@@ -98,7 +74,6 @@ void LocalInterface::addRemoteCommand_slot(const QString& pService_name, const Q
     if(service_iter != mServices.end())
     {
         CommandInfo command_info(pInfo);
-        qio::qout << CMD_INIT_MSG << command_info.getName() << endl;
         auto command_rep = service_iter.value()->addCommand(pInfo);
         mHost_node->enableRemoting(command_rep, "interface/" + pService_name + "/" + command_info.getName());
     }
@@ -126,12 +101,14 @@ void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_
 {
     if (!mServices.contains(pName))
     {
+         qio::qout << SERVICE_INIT_MSG << pName << endl;
          mServices.insert(pName, QPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
     }
 }
 
 void LocalInterface::removeService_slot(const QString &pName)
 {
+    qio::qout << SERVICE_EXIT_MSG << pName << endl;
     mServices.remove(pName);
 }
 
@@ -254,6 +231,40 @@ void LocalInterface::help_cmd(const QString &pStr)
 void LocalInterface::sync_cmd()
 {
     emit synchronize_signal();
+}
+
+void LocalInterface::init_help_cmd()
+{
+    CommandInfo info;
+    info.setName("help");
+    info.setHelpTip("helps to find command and get discription");
+    info.addArg(
+            ArgInfo
+            {
+                .name="filter",
+                .short_name = 'f',
+                .help_tip = "search for commands which contain <filter>,\n"
+                            "show command's details if it's found."
+            }
+        );
+    addGlobalCommand(this, &LocalInterface::help_cmd, info);
+}
+
+void LocalInterface::init_sync_cmd()
+{
+    CommandInfo info;
+    info.setName("sync");
+    info.setHelpTip("Synchronize data from existing services.");
+    addGlobalCommand(this, &LocalInterface::sync_cmd, info);
+}
+
+void LocalInterface::init_remoting()
+{
+    //TODO url should be overwrited with IP
+    QUrl url = QUrl(QStringLiteral("local:interface"));
+    mHost_node = new QRemoteObjectHost(url, this);
+    mHost_node->enableRemoting(this); // enable remoting/sharing
+    QTimer::singleShot(0, this, SLOT(run_slot()));
 }
 
 void InputReader::listenForInput_slot()

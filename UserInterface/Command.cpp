@@ -19,7 +19,7 @@ Command::Command(QObject *parent, CommandInfo pInfo):
 
 Command::~Command()
 {
-    emit destroyed();
+    emit destroyed_signal();
 }
 
 const CommandInfo &Command::getInfo() const

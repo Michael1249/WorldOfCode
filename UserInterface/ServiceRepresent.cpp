@@ -46,7 +46,7 @@ void ServiceRepresent::processCommand(const QString& pCommand_str)
     QString command_name = pCommand_str.section(" ", 0, 0);
     QString command_args = pCommand_str.section(" ", 1);
 
-    if (command_name != "")
+    if (!command_name.isEmpty())
     {
         auto command_iter = mCommands.find(command_name);
 
@@ -68,5 +68,6 @@ const ServiceRepresent::CommandMap &ServiceRepresent::getCommands() const
 {
     return mCommands;
 }
+
 
 } // UI

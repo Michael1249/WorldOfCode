@@ -57,7 +57,6 @@ void LocalInterface::addExistCommand(Command* pCommand)
         {
             QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), pCommand, SLOT(exec_slot(const QVector<QString>&)));
             QObject::connect(pCommand, SIGNAL(destroyed_signal()), command_rep, SLOT(commandDestroyed_slot()));
-
         }
 
     }

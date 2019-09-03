@@ -58,7 +58,7 @@ void UI::RemoteInterface::connectSyncSignal(UI::Command *pCommand)
 {
     QObject::connect(mReplica.data(), &InterfaceReplica::synchronize_signal, pCommand, [this, pCommand]()
     {
-        addExistCommand(pCommand);
+        mReplica->addRemoteCommand_slot(pCommand->getServiceName(), QJsonDocument(pCommand->getInfo().toJson()).toJson());
     });
 }
 

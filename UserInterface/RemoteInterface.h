@@ -21,8 +21,9 @@ private slots:
     void sync();
 
 private:
-    virtual void addService(ServiceBase* pServise);
-    virtual void addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo);
+    virtual void connectSyncSignal(ServiceBase* pServise);
+    virtual void connectSyncSignal(Command* pCommand);
+    virtual void addExistCommand(Command* pCommand);
     QRemoteObjectNode* mReplica_node;
     QSharedPointer<InterfaceReplica> mReplica;
 };

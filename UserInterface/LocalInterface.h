@@ -39,22 +39,28 @@ private slots:
     virtual void addRemoteCommand_slot(const QString& pService_name, const QByteArray& pInfo);
     virtual void addService_slot(const QString& pName, const QString& pHelp_tip);
     virtual void removeService_slot(const QString& pName);
+    void disableRemoting(QObject* pObj);
 
 signals:
     void listenForInput_signal();
     void finished_signal();
 
 private:
-    virtual void addService(ServiceBase* pServise);
-    virtual void addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo);
+
+    virtual void connectSyncSignal(ServiceBase* pServise);
+    virtual void connectSyncSignal(Command* pCommand);
+    virtual void addExistCommand(Command* pCommand);
     void listenForInput();
 
     // commands
     void help_cmd(const QString& pStr);
     void sync_cmd();
+    void quit_cmd();
 
+    void init_global_service();
     void init_help_cmd();
     void init_sync_cmd();
+    void init_quit_cmd();
 
     void init_remoting();
 

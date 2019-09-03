@@ -6,6 +6,7 @@
 #include "qexceptionmessage.h"
 #include "UIConstants.h"
 #include "Command.h"
+#include "ServiceBase.h"
 
 
 namespace UI
@@ -25,6 +26,16 @@ Command::~Command()
 const CommandInfo &Command::getInfo() const
 {
     return mInfo;
+}
+
+const QString Command::getServiceName() const
+{
+    return mService_name ? *mService_name : GLOBAL_SERVICE_NAME;
+}
+
+void Command::setServiceName(QString* pName)
+{
+    mService_name = pName;
 }
 
 void Command::exec_slot(const QVector<QString> &pArg_vals)
@@ -169,7 +180,7 @@ QVector<QString> CommandRepresent::parseArgsList(const QStringList &pArgs_list) 
 
 void CommandRepresent::commandDestroyed_slot()
 {
-    emit destroyed(mInfo.getName());
+    emit commandDestroyed_signal(mInfo.getName());
 }
 
 CommandInfo::CommandInfo(const QByteArray &data)

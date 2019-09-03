@@ -66,6 +66,7 @@ else()
 endif()
 
 set(SOURCES
+    InterfaceBase.cpp
     LocalInterface.cpp
     RemoteInterface.cpp
     Interface_source.h

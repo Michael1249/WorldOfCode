@@ -14,19 +14,28 @@ ServiceRepresent::ServiceRepresent(const QString &pName, const QString &pHelp_ti
 
 CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 {
-    qio::qout << CMD_INIT_MSG << pInfo.getName() << endl;
-    auto command_rep = mCommands.insert(
-                pInfo.getName(),
-                QPointer<CommandRepresent>(new CommandRepresent(pInfo))
-    ).value().data();
-    QObject::connect(command_rep, SIGNAL(destroyed(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
+    CommandRepresent* command_rep = nullptr;
+    if(!mCommands.contains(pInfo.getName()))
+    {
+        qio::qout << CMD_INIT_MSG << mName << ' ' << pInfo.getName() << endl;
+        command_rep = mCommands.insert(
+                    pInfo.getName(),
+                    QPointer<CommandRepresent>(new CommandRepresent(pInfo))
+        ).value().data();
+        QObject::connect(command_rep, SIGNAL(commandDestroyed_signal(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
+
+    }
+    else
+    {
+        qio::qout << "[ERROR]: Can not add command '" + pInfo.getName() + "' to service '" + mName + "'. Command allready exists." << endl;
+    }
 
     return command_rep;
 }
 
 void ServiceRepresent::removeCommand_slot(const QString &pCommand_name)
 {
-    qio::qout << CMD_EXIT_MSG << pCommand_name << endl;
+    qio::qout << CMD_EXIT_MSG << mName << ' ' << pCommand_name << endl;
     mCommands.remove(pCommand_name);
 }
 

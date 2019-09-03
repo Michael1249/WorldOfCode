@@ -22,9 +22,11 @@ protected:
     friend class ServiceBase;
 
     template<class obj_t, class mFunc_t>
-    void addCommand(const QString& pService_name, obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo);
-    virtual void addService(ServiceBase* pServise) = 0;
-    virtual void addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo) = 0;
+    Command& addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo, QString* pServiceName = nullptr);
+    void addService(ServiceBase* pServise);
+    virtual void connectSyncSignal(ServiceBase* pServise) = 0;
+    virtual void connectSyncSignal(Command* pCommand) = 0;
+    virtual void addExistCommand(Command* pCommand) = 0;
     virtual void addService_slot(const QString& pName, const QString& pHelp_tip) = 0;
     virtual void removeService_slot(const QString& pName) = 0;
 
@@ -33,15 +35,18 @@ protected:
 template<class obj_t, class mFunc_t>
 void InterfaceBase::addGlobalCommand(obj_t *pObj, mFunc_t pFunc, const CommandInfo &pInfo)
 {
-    addCommand(GLOBAL_SERVICE_NAME, pObj, pFunc, pInfo);
+    addCommand(pObj, pFunc, pInfo);
 }
 
 template<class obj_t, class mFunc_t>
-void InterfaceBase::addCommand(const QString& pService_name, obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo)
+Command& InterfaceBase::addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo, QString* pServiceName)
 {
     Command* cmd = new Command(pObj, pInfo);
     cmd->link_to(pObj, pFunc);
-    addExistCommand(pService_name, *cmd, pInfo);
+    cmd->setServiceName(pServiceName);
+    addExistCommand(cmd);
+    connectSyncSignal(cmd);
+    return *cmd;
 }
 
 } // UI

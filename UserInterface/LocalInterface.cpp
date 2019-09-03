@@ -11,11 +11,10 @@ namespace UI
 LocalInterface::LocalInterface(QCoreApplication *pApp):
     InterfaceSimpleSource (pApp)
 {
-    // Init Global service
-    addService_slot(GLOBAL_SERVICE_NAME, GLOBAL_SERVICE_HELP_TIP);
-
+    init_global_service();
     init_help_cmd();
     init_sync_cmd();
+    init_quit_cmd();
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
@@ -29,40 +28,43 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     QObject::connect(this, SIGNAL(finished_signal()), pApp, SLOT(quit()));
 }
 
-void LocalInterface::addService(ServiceBase* pServise)
+void LocalInterface::connectSyncSignal(ServiceBase* pServise)
 {
-    addService_slot(pServise->getName(), pServise->getHelpTip());
+    QObject::connect(this, &LocalInterface::synchronize_signal, pServise, [this, pServise]()
+    {
+        addService_slot(pServise->getName(), pServise->getHelpTip());
+    });
 }
 
-void LocalInterface::addExistCommand(const QString& pService_name, Command& pCommand, const CommandInfo& pInfo)
+void LocalInterface::connectSyncSignal(Command *pCommand)
 {
-    // TODO: overwrite this shit
-    auto service_iter = mServices.find(pService_name);
+    QObject::connect(this, &LocalInterface::synchronize_signal, pCommand, [this, pCommand]()
+    {
+        addExistCommand(pCommand);
+    });
+}
+
+
+void LocalInterface::addExistCommand(Command* pCommand)
+{
+    auto service_iter = mServices.find(pCommand->getServiceName());
 
     if(service_iter != mServices.end())
     {
-        auto command_rep = service_iter.value()->addCommand(pInfo);
-        QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
-        QObject::connect(&pCommand, SIGNAL(destroyed_signal()), command_rep, SLOT(commandDestroyed_slot()));
-        QObject::connect(this, &LocalInterface::synchronize_signal, &pCommand, [this, &pCommand, &pService_name]()
-        {
-            auto service_iter = mServices.find(pService_name);
+        auto command_rep = service_iter.value()->addCommand(pCommand->getInfo());
 
-            if(service_iter != mServices.end())
-            {
-                auto command_rep = service_iter.value()->addCommand(pCommand.getInfo());
-                QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), &pCommand, SLOT(exec_slot(const QVector<QString>&)));
-                QObject::connect(&pCommand, SIGNAL(destroyed()), command_rep, SLOT(commandDestroyed_slot()));
-            }
-            else
-            {
-                // TODO: exception or ???
-            }
-        });
+        if(command_rep)
+        {
+            QObject::connect(command_rep, SIGNAL(exec_signal(const QVector<QString>&)), pCommand, SLOT(exec_slot(const QVector<QString>&)));
+            QObject::connect(pCommand, SIGNAL(destroyed_signal()), command_rep, SLOT(commandDestroyed_slot()));
+
+        }
+
     }
     else
     {
-        // TODO: exception or ???
+        qio::qout << "[ERROR]: Can not add command '" + pCommand->getInfo().getName() +
+                    "' to service '" + pCommand->getServiceName() + "'. Service does not exist!" << endl;
     }
 
 }
@@ -70,16 +72,23 @@ void LocalInterface::addExistCommand(const QString& pService_name, Command& pCom
 void LocalInterface::addRemoteCommand_slot(const QString& pService_name, const QByteArray &pInfo)
 {
     auto service_iter = mServices.find(pService_name);
+    CommandInfo command_info(pInfo);
 
     if(service_iter != mServices.end())
     {
-        CommandInfo command_info(pInfo);
         auto command_rep = service_iter.value()->addCommand(pInfo);
-        mHost_node->enableRemoting(command_rep, "interface/" + pService_name + "/" + command_info.getName());
+
+        if(command_rep)
+        {
+            mHost_node->enableRemoting(command_rep, "interface/" + pService_name + "/" + command_info.getName());
+            QObject::connect(command_rep, SIGNAL(destroyed(QObject*)), this, SLOT(disableRemoting(QObject*)));
+        }
+
     }
     else
     {
-
+        qio::qout << "[ERROR]: Can not add command '" + command_info.getName() +
+                    "' to service '" + pService_name + "'. Service does not exist!" << endl;
     }
 
 }
@@ -104,12 +113,32 @@ void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_
          qio::qout << SERVICE_INIT_MSG << pName << endl;
          mServices.insert(pName, QPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
     }
+    else
+    {
+        qio::qout << "[ERROR]: Can not add service '" + pName +
+                     "'. This service allready exists." << endl;
+    }
 }
 
 void LocalInterface::removeService_slot(const QString &pName)
 {
-    qio::qout << SERVICE_EXIT_MSG << pName << endl;
-    mServices.remove(pName);
+    if (mServices.contains(pName))
+    {
+        qio::qout << SERVICE_EXIT_MSG << pName << endl;
+        mServices.remove(pName);
+    }
+    else
+    {
+        qio::qout << "[ERROR]: Can not remove service '" + pName +
+                     "'. This service allready removed." << endl;
+    }
+
+}
+
+void LocalInterface::disableRemoting(QObject *pObj)
+{
+    qio::qout << "QQQQQQ"<< endl;
+    mHost_node->disableRemoting(pObj);
 }
 
 void LocalInterface::run_slot()
@@ -230,7 +259,19 @@ void LocalInterface::help_cmd(const QString &pStr)
 
 void LocalInterface::sync_cmd()
 {
+    mServices.clear();
+    init_global_service();
     emit synchronize_signal();
+}
+
+void LocalInterface::quit_cmd()
+{
+    emit finished_signal();
+}
+
+void LocalInterface::init_global_service()
+{
+    addService_slot(GLOBAL_SERVICE_NAME, GLOBAL_SERVICE_HELP_TIP);
 }
 
 void LocalInterface::init_help_cmd()
@@ -256,6 +297,14 @@ void LocalInterface::init_sync_cmd()
     info.setName("sync");
     info.setHelpTip("Synchronize data from existing services.");
     addGlobalCommand(this, &LocalInterface::sync_cmd, info);
+}
+
+void LocalInterface::init_quit_cmd()
+{
+    CommandInfo info;
+    info.setName("quit");
+    info.setHelpTip("Quit the terminal.");
+    addGlobalCommand(this, &LocalInterface::quit_cmd, info);
 }
 
 void LocalInterface::init_remoting()

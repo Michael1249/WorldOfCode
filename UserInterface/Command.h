@@ -10,7 +10,6 @@
 
 namespace UI
 {
-
 struct ArgInfo
 {
     QJsonObject toJson() const;
@@ -67,7 +66,7 @@ public:
     void execCommand(const QString& pArgs_line);
 
 signals:
-    void destroyed(const QString&);
+    void commandDestroyed_signal(const QString&);
 
 public slots:
     void commandDestroyed_slot();
@@ -97,6 +96,8 @@ public:
     ~Command();
 
     const CommandInfo& getInfo() const;
+    const QString getServiceName() const;
+    void setServiceName(QString* pName);
 
     template<class Obj_t, class MFunc_t>
     void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
@@ -109,6 +110,7 @@ signals:
 
 private:
     CommandInfo mInfo;
+    QString* mService_name = nullptr;
     std::unique_ptr<ICommandDelegate> mDelegate;
 };
 

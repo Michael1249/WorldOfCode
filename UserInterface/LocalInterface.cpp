@@ -109,8 +109,8 @@ void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_
 {
     if (!mServices.contains(pName))
     {
-         qio::qout << SERVICE_INIT_MSG << pName << endl;
-         mServices.insert(pName, QPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
+         qio::qout << SERVICE_ADDED_MSG << pName << endl;
+         mServices.insert(pName, QSharedPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
     }
     else
     {
@@ -123,7 +123,7 @@ void LocalInterface::removeService_slot(const QString &pName)
 {
     if (mServices.contains(pName))
     {
-        qio::qout << SERVICE_EXIT_MSG << pName << endl;
+        qio::qout << SERVICE_REMOVED_MSG << pName << endl;
         mServices.remove(pName);
     }
     else
@@ -136,7 +136,6 @@ void LocalInterface::removeService_slot(const QString &pName)
 
 void LocalInterface::disableRemoting(QObject *pObj)
 {
-    qio::qout << "QQQQQQ"<< endl;
     mHost_node->disableRemoting(pObj);
 }
 

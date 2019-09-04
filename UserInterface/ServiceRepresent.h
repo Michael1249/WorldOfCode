@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <QMap>
-#include <QPointer>
+#include <QSharedPointer>
 #include <QString>
 #include "Command.h"
 
@@ -16,7 +16,7 @@ class ServiceRepresent: public QObject
 
 public:
 
-    using CommandMap = QMap<QString, QPointer<CommandRepresent>>;
+    using CommandMap = QMap<QString, QSharedPointer<CommandRepresent>>;
 
     ServiceRepresent(const QString& pName, const QString& pHelp_tip = "");
 

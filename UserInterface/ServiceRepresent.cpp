@@ -17,10 +17,10 @@ CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
     CommandRepresent* command_rep = nullptr;
     if(!mCommands.contains(pInfo.getName()))
     {
-        qio::qout << CMD_INIT_MSG << mName << ' ' << pInfo.getName() << endl;
+        qio::qout << COMMAND_ADDED_MSG << mName << ' ' << pInfo.getName() << endl;
         command_rep = mCommands.insert(
                     pInfo.getName(),
-                    QPointer<CommandRepresent>(new CommandRepresent(pInfo))
+                    QSharedPointer<CommandRepresent>(new CommandRepresent(pInfo))
         ).value().data();
         QObject::connect(command_rep, SIGNAL(commandDestroyed_signal(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
 
@@ -35,7 +35,7 @@ CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 
 void ServiceRepresent::removeCommand_slot(const QString &pCommand_name)
 {
-    qio::qout << CMD_EXIT_MSG << mName << ' ' << pCommand_name << endl;
+    qio::qout << COMMAND_REMOVED_MSG << mName << ' ' << pCommand_name << endl;
     mCommands.remove(pCommand_name);
 }
 

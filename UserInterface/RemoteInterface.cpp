@@ -11,7 +11,7 @@ UI::RemoteInterface::RemoteInterface(const QUrl &pUrl)
     mReplica_node->connectToNode(pUrl); // connect with remote host node
 
     mReplica.reset(mReplica_node->acquire<InterfaceReplica>()); // acquire replica of source from host node
-    QObject::connect(mReplica.data(), SIGNAL(synchronize_signal()), this, SLOT(sync()));
+    QObject::connect(mReplica.data(), SIGNAL(synchronize_signal()), this, SLOT(synchronize_slot()));
 }
 
 
@@ -41,9 +41,9 @@ void UI::RemoteInterface::removeService_slot(const QString &pName)
     mReplica->removeService_slot(pName);
 }
 
-void UI::RemoteInterface::sync()
+void UI::RemoteInterface::synchronize_slot()
 {
-    printf("SYNC");
+    //TODO here will be log
 }
 
 void UI::RemoteInterface::connectSyncSignal(UI::ServiceBase *pServise)

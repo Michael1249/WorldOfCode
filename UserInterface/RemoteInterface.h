@@ -18,7 +18,7 @@ public:
 private slots:
     virtual void addService_slot(const QString& pName, const QString& pHelp_tip);
     virtual void removeService_slot(const QString& pName);
-    void sync();
+    void synchronize_slot();
 
 private:
     virtual void connectSyncSignal(ServiceBase* pServise);

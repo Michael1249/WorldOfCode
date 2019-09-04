@@ -26,7 +26,7 @@ class LocalInterface : public InterfaceSimpleSource, public InterfaceBase
 
 public:
 
-    using ServiceRepresentMap = QMap<QString, QPointer<ServiceRepresent>>;
+    using ServiceRepresentMap = QMap<QString, QSharedPointer<ServiceRepresent>>;
 
     LocalInterface(QCoreApplication *pApp);
     ~LocalInterface();

@@ -51,7 +51,7 @@ void LocalInterface::addExistCommand(Command* pCommand)
 
     if(service_iter != mServices.end())
     {
-        auto command_rep = service_iter.value()->addCommand(pCommand->getInfo());
+        auto command_rep = service_iter->second.get()->addCommand(pCommand->getInfo());
 
         if(command_rep)
         {
@@ -75,7 +75,7 @@ void LocalInterface::addRemoteCommand_slot(const QString& pService_name, const Q
 
     if(service_iter != mServices.end())
     {
-        auto command_rep = service_iter.value()->addCommand(pInfo);
+        auto command_rep = service_iter->second.get()->addCommand(pInfo);
 
         if(command_rep)
         {

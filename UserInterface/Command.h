@@ -10,6 +10,7 @@
 
 namespace UI
 {
+class ServiceBase;
 struct ArgInfo
 {
     QJsonObject toJson() const;
@@ -92,12 +93,12 @@ class Command: public QObject
 public:
 
     Q_DISABLE_COPY_MOVE(Command)
-    Command(QObject* parent, CommandInfo pInfo);
+    Command(QObject* parent, CommandInfo pInfo, ServiceBase* pService = nullptr);
     ~Command();
 
     const CommandInfo& getInfo() const;
-    const QString getServiceName() const;
-    void setServiceName(QString* pName);
+    const QString& getServiceName() const;
+    const ServiceBase* getService() const;
 
     template<class Obj_t, class MFunc_t>
     void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
@@ -110,7 +111,7 @@ signals:
 
 private:
     CommandInfo mInfo;
-    QString* mService_name = nullptr;
+    ServiceBase* mService = nullptr;
     std::unique_ptr<ICommandDelegate> mDelegate;
 };
 

@@ -12,9 +12,10 @@
 namespace UI
 {
 
-Command::Command(QObject *parent, CommandInfo pInfo):
+Command::Command(QObject *parent, CommandInfo pInfo, ServiceBase *pService):
     QObject (parent),
-    mInfo(pInfo)
+    mInfo(pInfo),
+    mService(pService)
 {
 }
 
@@ -28,14 +29,14 @@ const CommandInfo &Command::getInfo() const
     return mInfo;
 }
 
-const QString Command::getServiceName() const
+const ServiceBase *Command::getService() const
 {
-    return mService_name ? *mService_name : GLOBAL_SERVICE_NAME;
+    return mService;
 }
 
-void Command::setServiceName(QString* pName)
+const QString& Command::getServiceName() const
 {
-    mService_name = pName;
+    return mService ? mService->getName() : GLOBAL_SERVICE_NAME;
 }
 
 void Command::exec_slot(const QVector<QString> &pArg_vals)

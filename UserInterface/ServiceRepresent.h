@@ -16,7 +16,7 @@ class ServiceRepresent: public QObject
 
 public:
 
-    using CommandMap = QMap<QString, QSharedPointer<CommandRepresent>>;
+    using CommandMap = std::map<QString, std::unique_ptr<CommandRepresent>>;
 
     ServiceRepresent(const QString& pName, const QString& pHelp_tip = "");
 

@@ -22,7 +22,7 @@ protected:
     friend class ServiceBase;
 
     template<class obj_t, class mFunc_t>
-    Command& addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo, QString* pServiceName = nullptr);
+    Command& addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo, ServiceBase* pService = nullptr);
     void addService(ServiceBase* pServise);
     virtual void connectSyncSignal(ServiceBase* pServise) = 0;
     virtual void connectSyncSignal(Command* pCommand) = 0;
@@ -39,11 +39,10 @@ void InterfaceBase::addGlobalCommand(obj_t *pObj, mFunc_t pFunc, const CommandIn
 }
 
 template<class obj_t, class mFunc_t>
-Command& InterfaceBase::addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo, QString* pServiceName)
+Command& InterfaceBase::addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo, ServiceBase* pService)
 {
-    Command* cmd = new Command(pObj, pInfo);
+    Command* cmd = new Command(pObj, pInfo, pService);
     cmd->link_to(pObj, pFunc);
-    cmd->setServiceName(pServiceName);
     addExistCommand(cmd);
     connectSyncSignal(cmd);
     return *cmd;

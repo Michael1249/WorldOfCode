@@ -15,13 +15,13 @@ ServiceRepresent::ServiceRepresent(const QString &pName, const QString &pHelp_ti
 CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 {
     CommandRepresent* command_rep = nullptr;
-    if(!mCommands.contains(pInfo.getName()))
+    if(mCommands.find(pInfo.getName()) == mCommands.end())
     {
         qio::qout << COMMAND_ADDED_MSG << mName << ' ' << pInfo.getName() << endl;
-        command_rep = mCommands.insert(
+        command_rep = mCommands.emplace(
                     pInfo.getName(),
-                    QSharedPointer<CommandRepresent>(new CommandRepresent(pInfo))
-        ).value().data();
+                    std::make_unique<CommandRepresent>(pInfo)
+        ).first->second.get();
         QObject::connect(command_rep, SIGNAL(commandDestroyed_signal(const QString&)), this, SLOT(removeCommand_slot(const QString&)));
 
     }
@@ -36,7 +36,7 @@ CommandRepresent* ServiceRepresent::addCommand(const CommandInfo& pInfo)
 void ServiceRepresent::removeCommand_slot(const QString &pCommand_name)
 {
     qio::qout << COMMAND_REMOVED_MSG << mName << ' ' << pCommand_name << endl;
-    mCommands.remove(pCommand_name);
+    mCommands.erase(pCommand_name);
 }
 
 void ServiceRepresent::processCommand(const QString& pCommand_str)
@@ -52,7 +52,7 @@ void ServiceRepresent::processCommand(const QString& pCommand_str)
 
         if (command_iter != mCommands.end())
         {
-            command_iter.value()->execCommand(command_args);
+            command_iter->second->execCommand(command_args);
         }
         else
         {

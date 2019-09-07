@@ -107,10 +107,10 @@ void LocalInterface::listenForInput()
 
 void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_tip)
 {
-    if (!mServices.contains(pName))
+    if (mServices.find(pName) == mServices.end())
     {
          qio::qout << SERVICE_ADDED_MSG << pName << endl;
-         mServices.insert(pName, QSharedPointer<ServiceRepresent>(new ServiceRepresent(pName, pHelp_tip)));
+         mServices.emplace(pName, std::make_unique<ServiceRepresent>(pName, pHelp_tip));
     }
     else
     {
@@ -121,10 +121,10 @@ void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_
 
 void LocalInterface::removeService_slot(const QString &pName)
 {
-    if (mServices.contains(pName))
+    if (mServices.find(pName) != mServices.end())
     {
         qio::qout << SERVICE_REMOVED_MSG << pName << endl;
-        mServices.remove(pName);
+        mServices.erase(pName);
     }
     else
     {
@@ -155,11 +155,11 @@ void LocalInterface::processCommand_slot(const QString &line)
 
         if(service_iter != mServices.end())
         {
-            service_iter.value()->processCommand(command_line);
+            service_iter->second->processCommand(command_line);
         }
         else
         {
-            mServices.begin().value()->processCommand(line);
+            mServices.begin()->second->processCommand(line);
         }
 
     }

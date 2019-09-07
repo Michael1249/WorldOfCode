@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include "LocalInterface.h"
-#include "worker.h"
+#include "slaves.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,9 +8,7 @@ int main(int argc, char *argv[])
 
     UI::LocalInterface interface(&a);
 
-    Worker worker1(&interface, "Sam");
-
-    Worker worker2(&interface, "Bob");
+    Slaves my_slaves(&interface, "my_slaves");
 
     return a.exec();
 }

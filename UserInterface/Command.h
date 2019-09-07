@@ -10,7 +10,7 @@
 
 namespace UI
 {
-
+class ServiceBase;
 struct ArgInfo
 {
     QJsonObject toJson() const;
@@ -64,10 +64,10 @@ public:
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
 
-    void callCommand(const QString& pLine);
+    void execCommand(const QString& pArgs_line);
 
 signals:
-    void destroyed(const QString&);
+    void commandDestroyed_signal(const QString&);
 
 public slots:
     void commandDestroyed_slot();
@@ -93,30 +93,26 @@ class Command: public QObject
 public:
 
     Q_DISABLE_COPY_MOVE(Command)
-    Command() = default;
-    Command(QObject* parent);
+    Command(QObject* parent, CommandInfo pInfo, ServiceBase* pService = nullptr);
     ~Command();
+
+    const CommandInfo& getInfo() const;
+    const QString& getServiceName() const;
+    const ServiceBase* getService() const;
 
     template<class Obj_t, class MFunc_t>
     void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
-
-    void enable();
-    void disable(const QString& pReason = "");
-    bool isEnable() const;
 
 public slots:
     virtual void exec_slot(const QVector<QString> & pArg_vals);
 
 signals:
-    void destroyed();
+    void destroyed_signal();
 
 private:
-
-    QString pName;
+    CommandInfo mInfo;
+    ServiceBase* mService = nullptr;
     std::unique_ptr<ICommandDelegate> mDelegate;
-
-    bool mIs_enable = true;
-    QString mDisable_reason;
 };
 
 template<class Obj_t, class MFunc_t>

@@ -1,5 +1,7 @@
 class Interface
 {
-    SLOT(addRemoteCommand_slot(const QByteArray& pInfo));
-    SLOT(removeCommand_slot(const QString& pName));
+    SIGNAL(synchronize_signal());
+    SLOT(addRemoteCommand_slot(const QString& pServiceName, const QByteArray& pInfo));
+    SLOT(addService_slot(const QString& pName, const QString& pHelp_tip));
+    SLOT(removeService_slot(const QString& pName));
 };

@@ -6,69 +6,53 @@
 #include "qexceptionmessage.h"
 #include "UIConstants.h"
 #include "Command.h"
+#include "ServiceBase.h"
 
 
 namespace UI
 {
 
-Command::Command(QObject *parent):
-    QObject (parent)
+Command::Command(QObject *parent, CommandInfo pInfo, ServiceBase *pService):
+    QObject (parent),
+    mInfo(pInfo),
+    mService(pService)
 {
 }
 
 Command::~Command()
 {
-    emit destroyed();
+    emit destroyed_signal();
 }
 
-void Command::enable()
+const CommandInfo &Command::getInfo() const
 {
-    mIs_enable = true;
+    return mInfo;
 }
 
-void Command::disable(const QString& pReason)
+const ServiceBase *Command::getService() const
 {
-    if(pReason.size())
-    {
-        mDisable_reason = pReason;
-    }
-    else
-    {
-        mDisable_reason = CMD_DISABLE_REASON;
-    }
-
-    mIs_enable = false;
+    return mService;
 }
 
-bool Command::isEnable() const
+const QString& Command::getServiceName() const
 {
-    return mIs_enable;
+    return mService ? mService->getName() : GLOBAL_SERVICE_NAME;
 }
 
 void Command::exec_slot(const QVector<QString> &pArg_vals)
 {
-    if(mIs_enable)
+    try
     {
-
-        try
-        {
-            mDelegate.get()->Invoke(pArg_vals);
-        }
-        catch (QExceptionMessage& e)
-        {
-            qio::qout << "[ERROR]: " << e.getMessage() << endl;
-        }
-        catch (std::exception& e)
-        {
-            qio::qout << "[ERROR]: " << e.what() << endl;
-        }
-
+        mDelegate.get()->Invoke(pArg_vals);
     }
-    else
+    catch (QExceptionMessage& e)
     {
-        qio::qout << mDisable_reason << endl;
+        qio::qout << "[ERROR]: " << e.getMessage() << endl;
     }
-
+    catch (std::exception& e)
+    {
+        qio::qout << "[ERROR]: " << e.what() << endl;
+    }
 }
 
 // NOT MY CODE
@@ -197,7 +181,7 @@ QVector<QString> CommandRepresent::parseArgsList(const QStringList &pArgs_list) 
 
 void CommandRepresent::commandDestroyed_slot()
 {
-    emit destroyed(mInfo.getName());
+    emit commandDestroyed_signal(mInfo.getName());
 }
 
 CommandInfo::CommandInfo(const QByteArray &data)
@@ -302,11 +286,11 @@ void CommandRepresent::setInfo(const CommandInfo& pInfo)
     mInfo = pInfo;
 }
 
-void CommandRepresent::callCommand(const QString& pArgs)
+void CommandRepresent::execCommand(const QString& pArgs_line)
 {
     try
     {
-        auto args_list = splitArgsLine(pArgs);
+        auto args_list = splitArgsLine(pArgs_line);
         auto arg_vals = parseArgsList(args_list);
         emit exec_signal(arg_vals);
     }

@@ -66,6 +66,7 @@ else()
 endif()
 
 set(SOURCES
+    InterfaceBase.cpp
     LocalInterface.cpp
     RemoteInterface.cpp
     Interface_source.h
@@ -73,7 +74,8 @@ set(SOURCES
     Command.cpp
     CommandRepresent_source.h
     CommandRepresent_replica.h
-    CommandParser.cpp
+    ServiceRepresent.cpp
+    ServiceBase.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

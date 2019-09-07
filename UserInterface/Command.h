@@ -6,12 +6,16 @@
 #include <QObject>
 #include <QVector>
 #include "CommandDelegate.h"
+#include "CommandRepresent_source.h"
 
 namespace UI
 {
-
+class ServiceBase;
 struct ArgInfo
 {
+    QJsonObject toJson() const;
+    void fromJson(const QJsonObject& pData);
+
     QString name;
     QChar short_name;
 
@@ -21,24 +25,37 @@ struct ArgInfo
 
 class CommandInfo
 {
+
 public:
+    CommandInfo() = default;
+    CommandInfo(const QByteArray& pData);
+
+    // TODO: overwrite "serialization" with operator<< and operator>>
+    // instead casting to Json (aka QByteArray)
+    QJsonObject toJson() const;
+    void fromJson(const QByteArray& pData);
 
     void setName(const QString& pNaame);
-    void setArg(const ArgInfo& pArg);
+    void addArg(const ArgInfo& pArg);
     void setHelpTip(const QString& pHelp_tip);
+    void setFlagTrack(bool pFlag_track);
 
     const QString& getName() const;
     const QString& getHelpTip() const;
     const QList<ArgInfo>& getArgumentsInfo() const;
+    bool getFlagTrack() const;
     bool hasHelpTip() const;
 
 private:
+    QJsonArray argumentsToJson() const;
+    void argumentsFromJson(const QJsonArray& pArray);
     QString mName;
     QString mHelp_tip;
     QList<ArgInfo> mArguments;
+    bool mFlag_track;
 };
 
-class CommandRepresent:public QObject
+class CommandRepresent:public CommandRepresentSimpleSource
 {
     Q_OBJECT
 public:
@@ -47,10 +64,18 @@ public:
     const CommandInfo& getInfo() const;
     void setInfo(const CommandInfo& pInfo);
 
+    void execCommand(const QString& pArgs_line);
+
 signals:
-    void exec(const QString&);
+    void commandDestroyed_signal(const QString&);
+
+public slots:
+    void commandDestroyed_slot();
 
 private:
+    static QStringList splitArgsLine(const QString & pArgs_str);
+    QVector<QString> parseArgsList(const QStringList& pArgs_list) const;
+
     CommandInfo mInfo;
 };
 
@@ -68,45 +93,32 @@ class Command: public QObject
 public:
 
     Q_DISABLE_COPY_MOVE(Command)
-    Command() = default;
+    Command(QObject* parent, CommandInfo pInfo, ServiceBase* pService = nullptr);
     ~Command();
 
-    Command& setName(const QString& pName);
-    Command& addArg(const ArgInfo& pArg);
-    Command& setHelpTip(const QString& pHelp_tip);
-    template<class Obj_t, class MFunc_t>
-    Command& link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
-    void addToUI(bool pTrack = true);
-
-    void enable();
-    void disable(const QString& pReason = "");
-    bool isEnable() const;
-
     const CommandInfo& getInfo() const;
+    const QString& getServiceName() const;
+    const ServiceBase* getService() const;
 
-private slots:
-    void exec_slot(const QString& pArgs) const;
+    template<class Obj_t, class MFunc_t>
+    void link_to(Obj_t* pObj_ptr, MFunc_t pMfunc_ptr);
+
+public slots:
+    virtual void exec_slot(const QVector<QString> & pArg_vals);
+
+signals:
+    void destroyed_signal();
 
 private:
-
-    static QStringList splitArgsLine(const QString & pArgs_str);
-    QVector<QString> parseArgLine(const QStringList& args_list) const;
-
     CommandInfo mInfo;
+    ServiceBase* mService = nullptr;
     std::unique_ptr<ICommandDelegate> mDelegate;
-
-    bool mIs_enable = true;
-    QString mDisable_reason;
-
-    //if true, track creation and destruction and output to console
-    bool mFlag_track;
 };
 
 template<class Obj_t, class MFunc_t>
-Command &Command::link_to(Obj_t *pObj_ptr, MFunc_t pMfunc_ptr)
+void Command::link_to(Obj_t *pObj_ptr, MFunc_t pMfunc_ptr)
 {
     mDelegate = getCommandDelegate(pObj_ptr, pMfunc_ptr);
-    return *this;
 }
 
 } //UI

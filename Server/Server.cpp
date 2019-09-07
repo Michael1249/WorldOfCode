@@ -3,16 +3,13 @@
 #include "Server.h"
 #include "qiostream.h"
 #include "qexceptionmessage.h"
+#include "Interface_replica.h"
 
 Server::Server():
       mGames_dir(QDir(QCoreApplication::applicationDirPath() + "/Games"))
 {
-}
 
-Server::~Server()
-{
 }
-
 
 QStringList Server::getExistingGames()
 {
@@ -29,4 +26,55 @@ QStringList Server::getExistingGames()
 
     return result;
 }
+
+void Server::launch_game(const QString &pGame_name)
+{
+    QString pathToGame = mGames_dir.path() + '/' + pGame_name + '/' + pGame_name + ".exe";
+    if(QFileInfo::exists(pathToGame))
+    {
+        mGame_process->start(pathToGame);
+        if(!mGame_process->waitForStarted())
+            qio::qout << "Server can not start game." << pGame_name << endl;
+
+        QObject::connect(mGame_process, SIGNAL(readyReadStandardOutput(QPrivateSignal)), this, SIGNAL(readyReadStd()), Qt::QueuedConnection);
+        QObject::connect(mGame_process, SIGNAL(readyReadStandardError(QPrivateSignal)), this, SIGNAL(readyReadErr()), Qt::QueuedConnection);
+    }
+    else qio::qout << "Game " << pGame_name << " is not exist." << endl;
+
+}
+
+void Server::print(const QString &pStr)
+{
+    mGame_process->write(pStr.toUtf8());
+}
+
+QString Server::readStd()
+{
+    return mGame_process->readAllStandardOutput();
+}
+
+QString Server::readErr()
+{
+    return mGame_process->readAllStandardError();
+}
+
+QProcess::ProcessState Server::getState()
+{
+    return mGame_process->state();
+
+}
+
+void Server::close_game()
+{
+    mGame_process->terminate();
+
+    if(!mGame_process->waitForFinished()) mGame_process->close();
+}
+
+Server::~Server()
+{
+    close_game();
+}
+
+
 

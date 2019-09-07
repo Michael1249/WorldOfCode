@@ -6,13 +6,14 @@
 #include <QProcess>
 #include "Command.h"
 
-class Server
+class Server : QObject
 {
+    Q_OBJECT
 public:
     Server();
     ~Server();
 
-    void lounch_game(const QString& pGame_name);
+    void launch_game(const QString& pGame_name);
     void close_game();
 
     void print(const QString& pStr);
@@ -28,7 +29,7 @@ signals:
 private:
     QStringList getExistingGames();
 
-    QProcess* mGame_procces;
+    QProcess* mGame_process;
     QDir mGames_dir;
 };
 

@@ -1,102 +1,27 @@
-#include "Interface.h"
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include "LocalInterface.h"
 #include "qiostream.h"
 #include "qexceptionmessage.h"
 #include "UIConstants.h"
 #include "Command.h"
+#include "ServiceBase.h"
 
 
 namespace UI
 {
 
+Command::Command(QObject *parent, CommandInfo pInfo, ServiceBase *pService):
+    QObject (parent),
+    mInfo(pInfo),
+    mService(pService)
+{
+}
+
 Command::~Command()
 {
-    Interface::getInstance().removeCommand(*this);
-    if(mFlag_track)
-    {
-        qio::qout << CMD_EXIT_MSG << mInfo.getName() << endl;
-    }
-}
-
-Command &Command::setName(const QString &pName)
-{
-    mInfo.setName(pName);
-    return *this;
-}
-
-Command& Command::addArg(const ArgInfo& pArg)
-{
-    mInfo.setArg(pArg);
-    return *this;
-}
-
-Command& Command::setHelpTip(const QString& pHelp_tip)
-{
-    mInfo.setHelpTip(pHelp_tip);
-    return *this;
-}
-
-void Command::addToUI(bool pTrack)
-{
-    Interface::getInstance().addCommand(*this);
-
-    mFlag_track = pTrack;
-    if(mFlag_track)
-    {
-        qio::qout << CMD_INIT_MSG << mInfo.getName() << endl;
-    }
-}
-
-void Command::exec_slot(const QString& pArgs) const
-{
-
-    if(mIs_enable)
-    {
-        QStringList arg_list = splitArgsLine(pArgs);
-
-        try
-        {
-            QVector<QString> val_list = parseArgLine(arg_list);
-            mDelegate.get()->Invoke(val_list);
-        }
-        catch (QExceptionMessage& e)
-        {
-            qio::qout << "[ERROR]: " << e.getMessage() << endl;
-        }
-        catch (std::exception& e)
-        {
-            qio::qout << "[ERROR]: " << e.what() << endl;
-        }
-
-    }
-    else
-    {
-        qio::qout << mDisable_reason << endl;
-    }
-
-}
-
-void Command::enable()
-{
-    mIs_enable = true;
-}
-
-void Command::disable(const QString& pReason)
-{
-    if(pReason.size())
-    {
-        mDisable_reason = pReason;
-    }
-    else
-    {
-        mDisable_reason = CMD_DISABLE_REASON;
-    }
-
-    mIs_enable = false;
-}
-
-bool Command::isEnable() const
-{
-    return mIs_enable;
+    emit destroyed_signal();
 }
 
 const CommandInfo &Command::getInfo() const
@@ -104,8 +29,34 @@ const CommandInfo &Command::getInfo() const
     return mInfo;
 }
 
+const ServiceBase *Command::getService() const
+{
+    return mService;
+}
+
+const QString& Command::getServiceName() const
+{
+    return mService ? mService->getName() : GLOBAL_SERVICE_NAME;
+}
+
+void Command::exec_slot(const QVector<QString> &pArg_vals)
+{
+    try
+    {
+        mDelegate.get()->Invoke(pArg_vals);
+    }
+    catch (QExceptionMessage& e)
+    {
+        qio::qout << "[ERROR]: " << e.getMessage() << endl;
+    }
+    catch (std::exception& e)
+    {
+        qio::qout << "[ERROR]: " << e.what() << endl;
+    }
+}
+
 // NOT MY CODE
-QStringList Command::splitArgsLine(const QString& pArgs_str)
+QStringList CommandRepresent::splitArgsLine(const QString& pArgs_str)
 {
     QStringList list;
     QString arg;
@@ -150,7 +101,7 @@ QString removeBrackets(const QString& pStr)
     return result;
 }
 
-QVector<QString> Command::parseArgLine(const QStringList &args_list) const
+QVector<QString> CommandRepresent::parseArgsList(const QStringList &pArgs_list) const
 {
     QVector<QString> values;
     QVector<bool> setted_values;
@@ -158,9 +109,9 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
     setted_values.resize(mInfo.getArgumentsInfo().size());
     bool flag_ban_positional = false;
 
-    for (int i = 0; i < args_list.size(); ++i)
+    for (int i = 0; i < pArgs_list.size(); ++i)
     {
-        const QString& current_arg = args_list[i];
+        const QString& current_arg = pArgs_list[i];
 
         if(current_arg.startsWith('-'))
         {
@@ -228,12 +179,41 @@ QVector<QString> Command::parseArgLine(const QStringList &args_list) const
     return values;
 }
 
+void CommandRepresent::commandDestroyed_slot()
+{
+    emit commandDestroyed_signal(mInfo.getName());
+}
+
+CommandInfo::CommandInfo(const QByteArray &data)
+{
+    fromJson(data);
+}
+
+QJsonObject CommandInfo::toJson() const
+{
+    QJsonObject json;
+    json["name"] = mName;
+    json["help_tip"] = mHelp_tip;
+    json["arguments"] = argumentsToJson();
+    json["flag_track"] = mFlag_track;
+    return json;
+}
+
+void CommandInfo::fromJson(const QByteArray &data)
+{
+    QJsonObject json = QJsonDocument::fromJson(data).object();
+    mName = json["name"].toString();
+    mHelp_tip = json["help_tip"].toString();
+    argumentsFromJson(json["arguments"].toArray());
+    mFlag_track = json["flag_track"].toBool();
+}
+
 void CommandInfo::setName(const QString &pNaame)
 {
     mName = pNaame;
 }
 
-void CommandInfo::setArg(const ArgInfo &pArg)
+void CommandInfo::addArg(const ArgInfo &pArg)
 {
     mArguments.append(pArg);
 }
@@ -263,6 +243,34 @@ bool CommandInfo::hasHelpTip() const
     return mHelp_tip.size();
 }
 
+QJsonArray CommandInfo::argumentsToJson() const
+{
+    QJsonArray array;
+       for (const auto& arg_info : mArguments)
+          array.append(arg_info.toJson());
+       return array;
+}
+
+void CommandInfo::argumentsFromJson(const QJsonArray &pArray)
+{
+    mArguments.clear();
+    for (const auto& iter : pArray)
+    {
+        mArguments.append(ArgInfo());
+        mArguments.last().fromJson(iter.toObject());
+    }
+}
+
+bool CommandInfo::getFlagTrack() const
+{
+    return mFlag_track;
+}
+
+void CommandInfo::setFlagTrack(bool pFlag_track)
+{
+    mFlag_track = pFlag_track;
+}
+
 CommandRepresent::CommandRepresent(const CommandInfo &pInfo):
     mInfo(pInfo)
 {
@@ -276,6 +284,42 @@ const CommandInfo &CommandRepresent::getInfo() const
 void CommandRepresent::setInfo(const CommandInfo& pInfo)
 {
     mInfo = pInfo;
+}
+
+void CommandRepresent::execCommand(const QString& pArgs_line)
+{
+    try
+    {
+        auto args_list = splitArgsLine(pArgs_line);
+        auto arg_vals = parseArgsList(args_list);
+        emit exec_signal(arg_vals);
+    }
+    catch (QExceptionMessage& e)
+    {
+        qio::qout << "[ERROR]: " << e.getMessage() << endl;
+    }
+    catch (std::exception& e)
+    {
+        qio::qout << "[ERROR]: " << e.what() << endl;
+    }
+}
+
+QJsonObject ArgInfo::toJson() const
+{
+    QJsonObject json;
+    json["name"] = name;
+    json["short_name"] = QString(short_name);
+    json["help_tip"] = help_tip;
+    json["default_value"] = default_value;
+    return json;
+}
+
+void ArgInfo::fromJson(const QJsonObject &pData)
+{
+    name = pData["name"].toString();
+    short_name = pData["short_name"].toString()[0];
+    help_tip = pData["help_tip"].toString();
+    default_value = pData["default_value"].toString();
 }
 
 } // UI

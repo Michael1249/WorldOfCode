@@ -24,6 +24,7 @@ signals:
 protected:
     template<class obj_t, class mFunc_t>
     void addCommand(obj_t* pObj, mFunc_t pFunc, const CommandInfo& pInfo);
+    InterfaceBase* getInterface();
 
 private:
     void connectDestroyCommands_signal(Command* cmd);

@@ -3,82 +3,14 @@
 
 #include <type_traits>
 #include <memory>
-#include <QObject>
 #include <QVector>
 #include "CommandDelegate.h"
 #include "CommandRepresent_source.h"
+#include "CommandInfo.h"
 
 namespace UI
 {
 class ServiceBase;
-struct ArgInfo
-{
-    QJsonObject toJson() const;
-    void fromJson(const QJsonObject& pData);
-
-    QString name;
-    QChar short_name;
-
-    QString help_tip = "";
-    QString default_value = "";
-};
-
-class CommandInfo
-{
-
-public:
-    CommandInfo() = default;
-    CommandInfo(const QByteArray& pData);
-
-    // TODO: overwrite "serialization" with operator<< and operator>>
-    // instead casting to Json (aka QByteArray)
-    QJsonObject toJson() const;
-    void fromJson(const QByteArray& pData);
-
-    void setName(const QString& pNaame);
-    void addArg(const ArgInfo& pArg);
-    void setHelpTip(const QString& pHelp_tip);
-    void setFlagTrack(bool pFlag_track);
-
-    const QString& getName() const;
-    const QString& getHelpTip() const;
-    const QList<ArgInfo>& getArgumentsInfo() const;
-    bool getFlagTrack() const;
-    bool hasHelpTip() const;
-
-private:
-    QJsonArray argumentsToJson() const;
-    void argumentsFromJson(const QJsonArray& pArray);
-    QString mName;
-    QString mHelp_tip;
-    QList<ArgInfo> mArguments;
-    bool mFlag_track;
-};
-
-class CommandRepresent:public CommandRepresentSimpleSource
-{
-    Q_OBJECT
-public:
-    CommandRepresent(const CommandInfo& pInfo);
-
-    const CommandInfo& getInfo() const;
-    void setInfo(const CommandInfo& pInfo);
-
-    void execCommand(const QString& pArgs_line);
-
-signals:
-    void commandDestroyed_signal(const QString&);
-
-public slots:
-    void commandDestroyed_slot();
-
-private:
-    static QStringList splitArgsLine(const QString & pArgs_str);
-    QVector<QString> parseArgsList(const QStringList& pArgs_list) const;
-
-    CommandInfo mInfo;
-};
-
 /*
 Represetn interface between User (Input) and c++ function
 

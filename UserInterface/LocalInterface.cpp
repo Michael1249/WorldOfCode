@@ -11,10 +11,6 @@ namespace UI
 LocalInterface::LocalInterface(QCoreApplication *pApp):
     InterfaceSimpleSource (pApp)
 {
-    init_global_service();
-    init_help_cmd();
-    init_sync_cmd();
-    init_quit_cmd();
 
     InputReader* reader = new InputReader();
     reader->moveToThread(&input_thread);
@@ -26,6 +22,8 @@ LocalInterface::LocalInterface(QCoreApplication *pApp):
     init_remoting();
 
     QObject::connect(this, SIGNAL(finished_signal()), pApp, SLOT(quit()));
+
+    mGlobal_service.reset(new GlobalService(this));
 }
 
 void LocalInterface::connectSyncSignal(ServiceBase* pServise)
@@ -47,9 +45,9 @@ void LocalInterface::connectSyncSignal(Command *pCommand)
 
 void LocalInterface::addExistCommand(Command* pCommand)
 {
-    auto service_iter = mServices.find(pCommand->getServiceName());
+    auto service_iter = mService_represents.find(pCommand->getServiceName());
 
-    if(service_iter != mServices.end())
+    if(service_iter != mService_represents.end())
     {
         auto command_rep = service_iter->second.get()->addCommand(pCommand->getInfo());
 
@@ -70,10 +68,10 @@ void LocalInterface::addExistCommand(Command* pCommand)
 
 void LocalInterface::addRemoteCommand_slot(const QString& pService_name, const QByteArray &pInfo)
 {
-    auto service_iter = mServices.find(pService_name);
+    auto service_iter = mService_represents.find(pService_name);
     CommandInfo command_info(pInfo);
 
-    if(service_iter != mServices.end())
+    if(service_iter != mService_represents.end())
     {
         auto command_rep = service_iter->second.get()->addCommand(pInfo);
 
@@ -107,10 +105,10 @@ void LocalInterface::listenForInput()
 
 void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_tip)
 {
-    if (mServices.find(pName) == mServices.end())
+    if (mService_represents.find(pName) == mService_represents.end())
     {
          qio::qout << SERVICE_ADDED_MSG << pName << endl;
-         mServices.emplace(pName, std::make_unique<ServiceRepresent>(pName, pHelp_tip));
+         mService_represents.emplace(pName, std::make_unique<ServiceRepresent>(pName, pHelp_tip));
     }
     else
     {
@@ -121,10 +119,10 @@ void LocalInterface::addService_slot(const QString &pName, const QString& pHelp_
 
 void LocalInterface::removeService_slot(const QString &pName)
 {
-    if (mServices.find(pName) != mServices.end())
+    if (mService_represents.find(pName) != mService_represents.end())
     {
         qio::qout << SERVICE_REMOVED_MSG << pName << endl;
-        mServices.erase(pName);
+        mService_represents.erase(pName);
     }
     else
     {
@@ -151,15 +149,15 @@ void LocalInterface::processCommand_slot(const QString &line)
 
     if(service_name != "")
     {
-        auto service_iter = mServices.find(service_name);
+        auto service_iter = mService_represents.find(service_name);
 
-        if(service_iter != mServices.end())
+        if(service_iter != mService_represents.end())
         {
             service_iter->second->processCommand(command_line);
         }
         else
         {
-            mServices.begin()->second->processCommand(line);
+            mService_represents.begin()->second->processCommand(line);
         }
 
     }
@@ -174,135 +172,15 @@ void LocalInterface::processCommand_slot(const QString &line)
     }
 }
 
-void LocalInterface::help_cmd(const QString &pStr)
+void LocalInterface::sync()
 {
-//    auto command_map = mServices.getCommands();
-
-//    for(auto iter = command_map.begin(); iter != command_map.end();)
-//    {
-//        if(!iter.value()->getInfo().getName().contains(pStr, Qt::CaseInsensitive))
-//        {
-//            iter = command_map.erase(iter);
-//        }
-//        else
-//        {
-//            ++iter;
-//        }
-//    }
-
-//    if (command_map.size() == 0)
-//    {
-//        qio::qout << NOTHING_FOUND_MSG << endl;
-//    }
-//    else if(command_map.size() == 1)
-//    {
-//        auto command = command_map.begin().value();
-//        qio::qout << command->getInfo().getName();
-
-//        for (auto& arg: command->getInfo().getArgumentsInfo())
-//        {
-//            qio::qout << QString(" <%1>").arg(arg.name);
-//        }
-
-//        qio::qout << endl;
-
-//        if(command->getInfo().hasHelpTip())
-//        {
-//            qio::qout << command->getInfo().getHelpTip() << endl;
-//        }
-
-//        if(command->getInfo().getArgumentsInfo().size())
-//        {
-//            qio::qout << left;
-
-//            for (auto& arg: command->getInfo().getArgumentsInfo())
-//            {
-//                qio::qout << QString(40, '_')
-//                          << endl
-//                          << QString("<%1, %2> = \"%3\"")
-//                             .arg(arg.name)
-//                             .arg(arg.short_name)
-//                             .arg(arg.default_value)
-//                          << endl
-//                          << arg.help_tip
-//                          << endl;
-//            }
-
-//        }
-//        else
-//        {
-//            qio::qout << WITHOUT_ARGUMENTS_MSG << endl;
-//        }
-
-//    }
-//    else
-//    {
-//        for(auto command : command_map)
-//        {
-//            qio::qout << qSetFieldWidth(16)
-//                      << left
-//                      << command->getInfo().getName();
-//            if(command->getInfo().hasHelpTip())
-//            {
-//                qio::qout << qSetFieldWidth(0)
-//                          << " : "
-//                          << command->getInfo().getHelpTip();
-//            }
-//            qio::qout << endl;
-//        }
-//    }
-
-    //  qio::qout.flush();
-}
-
-void LocalInterface::sync_cmd()
-{
-    mServices.clear();
-    init_global_service();
+    mService_represents.clear();
     emit synchronize_signal();
 }
 
-void LocalInterface::quit_cmd()
+void LocalInterface::quit()
 {
     emit finished_signal();
-}
-
-void LocalInterface::init_global_service()
-{
-    addService_slot(GLOBAL_SERVICE_NAME, GLOBAL_SERVICE_HELP_TIP);
-}
-
-void LocalInterface::init_help_cmd()
-{
-    CommandInfo info;
-    info.setName("help");
-    info.setHelpTip("helps to find command and get discription");
-    info.addArg(
-            ArgInfo
-            {
-                .name="filter",
-                .short_name = 'f',
-                .help_tip = "search for commands which contain <filter>,\n"
-                            "show command's details if it's found."
-            }
-        );
-    addGlobalCommand(this, &LocalInterface::help_cmd, info);
-}
-
-void LocalInterface::init_sync_cmd()
-{
-    CommandInfo info;
-    info.setName("sync");
-    info.setHelpTip("Synchronize data from existing services.");
-    addGlobalCommand(this, &LocalInterface::sync_cmd, info);
-}
-
-void LocalInterface::init_quit_cmd()
-{
-    CommandInfo info;
-    info.setName("quit");
-    info.setHelpTip("Quit the terminal.");
-    addGlobalCommand(this, &LocalInterface::quit_cmd, info);
 }
 
 void LocalInterface::init_remoting()

@@ -6,6 +6,7 @@
 #include "InterfaceBase.h"
 #include "ServiceRepresent.h"
 #include "Interface_source.h"
+#include "GlobalService.h"
 
 namespace UI
 {
@@ -34,6 +35,8 @@ public:
 public slots:
     void run_slot();
     void processCommand_slot(const QString& pLine);
+    void sync();
+    void quit();
 
 private slots:
     virtual void addRemoteCommand_slot(const QString& pService_name, const QByteArray& pInfo);
@@ -52,21 +55,12 @@ private:
     virtual void addExistCommand(Command* pCommand);
     void listenForInput();
 
-    // commands
-    void help_cmd(const QString& pStr);
-    void sync_cmd();
-    void quit_cmd();
-
-    void init_global_service();
-    void init_help_cmd();
-    void init_sync_cmd();
-    void init_quit_cmd();
-
     void init_remoting();
 
+    QScopedPointer<GlobalService> mGlobal_service;
     QRemoteObjectHost* mHost_node;
     QThread input_thread;
-    ServiceRepresentMap mServices;
+    ServiceRepresentMap mService_represents;
     bool mFlag_run_end = false;
 
 };

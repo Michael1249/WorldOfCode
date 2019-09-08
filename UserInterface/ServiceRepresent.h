@@ -5,7 +5,7 @@
 #include <QMap>
 #include <QSharedPointer>
 #include <QString>
-#include "Command.h"
+#include "CommandRepresent.h"
 
 namespace UI
 {

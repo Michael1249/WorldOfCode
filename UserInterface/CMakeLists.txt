@@ -71,11 +71,14 @@ set(SOURCES
     RemoteInterface.cpp
     Interface_source.h
     Interface_replica.h
+    CommandInfo.cpp
+    CommandRepresent.cpp
     Command.cpp
     CommandRepresent_source.h
     CommandRepresent_replica.h
     ServiceRepresent.cpp
     ServiceBase.cpp
+    GlobalService.cpp
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

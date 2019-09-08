@@ -25,6 +25,10 @@ const QString &UI::ServiceBase::getHelpTip()
     return mHelp_tip;
 }
 
+UI::InterfaceBase* UI::ServiceBase::getInterface()
+{
+    return mInterface;
+}
 void UI::ServiceBase::connectDestroyCommands_signal(UI::Command *cmd)
 {
     QObject::connect(this, SIGNAL(destroyCommands_signal()), cmd, SLOT(deleteLater()));
